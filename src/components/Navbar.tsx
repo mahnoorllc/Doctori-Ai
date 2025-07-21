@@ -34,6 +34,9 @@ export const Navbar = () => {
           <Link to="/about" className="text-foreground hover:text-primary transition-colors">
             About
           </Link>
+          <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+            Contact
+          </Link>
           <Button variant="hero" size="sm">
             Start Chat
           </Button>
@@ -64,6 +67,9 @@ export const Navbar = () => {
               </Link>
               <Link to="/about" className="block text-foreground hover:text-primary transition-colors">
                 About
+              </Link>
+              <Link to="/contact" className="block text-foreground hover:text-primary transition-colors">
+                Contact
               </Link>
               <Button variant="hero" size="sm" className="w-full">
                 Start Chat

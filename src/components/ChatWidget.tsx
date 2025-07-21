@@ -36,16 +36,30 @@ export const ChatWidget = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
 
-    // Simulate AI response
+    // Simulate AI response with more realistic health assistant responses
     setTimeout(() => {
+      let aiResponse = "I understand your concern. ";
+      
+      if (inputValue.toLowerCase().includes("headache") || inputValue.toLowerCase().includes("head")) {
+        aiResponse += "Headaches can have various causes. Are you drinking enough water? Have you been under stress lately? For persistent headaches, I'd recommend consulting with a doctor.";
+      } else if (inputValue.toLowerCase().includes("fever") || inputValue.toLowerCase().includes("temperature")) {
+        aiResponse += "A fever usually indicates your body is fighting an infection. Make sure to stay hydrated and rest. If your fever is above 101.3°F (38.5°C) or persists, please see a healthcare provider.";
+      } else if (inputValue.toLowerCase().includes("cough") || inputValue.toLowerCase().includes("cold")) {
+        aiResponse += "Coughs can be caused by various factors including allergies, infections, or irritants. If it persists for more than a week or you have other symptoms, consider seeing a doctor.";
+      } else {
+        aiResponse += "Based on what you've described, I'd recommend monitoring your symptoms. If they persist or worsen, please consult with a healthcare professional.";
+      }
+      
+      aiResponse += " Would you like me to help you find a doctor near you?";
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I understand your concern. Based on what you've described, I'd recommend consulting with a healthcare professional. Would you like me to help you find a doctor near you?",
+        text: aiResponse,
         isUser: false,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
+    }, 1500);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
