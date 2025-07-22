@@ -35,7 +35,10 @@ const Index = () => {
                   </span>
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Chat with our AI to understand your symptoms, get helpful tips, and find the right doctor near you. Your health journey starts here.
+                  Chat with our AI to understand your symptoms, receive health suggestions, and connect with nearby doctors instantly.
+                </p>
+                <p className="text-lg text-muted-foreground/80 leading-relaxed">
+                  Your trusted virtual health companion, available 24/7 to guide you on your wellness journey.
                 </p>
               </div>
               
@@ -66,12 +69,59 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* How It Works Section */}
       <section className="py-20 px-4">
         <div className="container max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              How Doctori AI Helps You
+              How It Works
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Get help in just 3 simple steps
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-20">
+            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 text-center">
+              <CardContent className="p-8">
+                <div className="bg-gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <MessageCircle className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">1. Ask Your Symptoms</h3>
+                <p className="text-muted-foreground">
+                  Describe your health concerns to our intelligent AI assistant in natural language.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 text-center">
+              <CardContent className="p-8">
+                <div className="bg-gradient-healing p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">2. Get Instant Advice</h3>
+                <p className="text-muted-foreground">
+                  Receive personalized health guidance and recommendations based on your symptoms.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 text-center">
+              <CardContent className="p-8">
+                <div className="bg-gradient-to-br from-accent to-accent/80 p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <Stethoscope className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">3. Connect with a Doctor</h3>
+                <p className="text-muted-foreground">
+                  Find and book appointments with verified healthcare professionals near you.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+              Your Complete Health Companion
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Get personalized health guidance, connect with doctors, and stay informed about your wellbeing
@@ -114,6 +164,106 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Doctors Section */}
+      <section className="py-20 px-4 bg-muted/20">
+        <div className="container max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Featured Doctors</h2>
+            <p className="text-muted-foreground">
+              Meet some of our trusted healthcare professionals
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <Card className="shadow-card hover:shadow-medical transition-all">
+              <CardContent className="p-6 text-center">
+                <img
+                  src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&h=120&fit=crop&crop=face"
+                  alt="Dr. Sarah Johnson"
+                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                />
+                <h3 className="font-semibold mb-1">Dr. Sarah Johnson</h3>
+                <Badge variant="secondary" className="mb-3">Cardiologist</Badge>
+                <div className="flex items-center justify-center space-x-1 mb-3">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => (
+                      <span key={i} className="text-yellow-400 text-sm">★</span>
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">4.8 (127 reviews)</span>
+                </div>
+                <Badge className="bg-green-100 text-green-700 mb-4">🟢 Available Today</Badge>
+                <Link to="/doctor/1">
+                  <Button variant="medical" size="sm" className="w-full">
+                    View Profile
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-card hover:shadow-medical transition-all">
+              <CardContent className="p-6 text-center">
+                <img
+                  src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=120&h=120&fit=crop&crop=face"
+                  alt="Dr. Michael Chen"
+                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                />
+                <h3 className="font-semibold mb-1">Dr. Michael Chen</h3>
+                <Badge variant="secondary" className="mb-3">General Practice</Badge>
+                <div className="flex items-center justify-center space-x-1 mb-3">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => (
+                      <span key={i} className="text-yellow-400 text-sm">★</span>
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">4.9 (203 reviews)</span>
+                </div>
+                <Badge className="bg-blue-100 text-blue-700 mb-4">⭐ Top Rated</Badge>
+                <Link to="/doctor/2">
+                  <Button variant="medical" size="sm" className="w-full">
+                    View Profile
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-card hover:shadow-medical transition-all">
+              <CardContent className="p-6 text-center">
+                <img
+                  src="https://images.unsplash.com/photo-1594824797147-5cd0b4cf9e67?w=120&h=120&fit=crop&crop=face"
+                  alt="Dr. Emily Rodriguez"
+                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                />
+                <h3 className="font-semibold mb-1">Dr. Emily Rodriguez</h3>
+                <Badge variant="secondary" className="mb-3">Pediatrics</Badge>
+                <div className="flex items-center justify-center space-x-1 mb-3">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => (
+                      <span key={i} className="text-yellow-400 text-sm">★</span>
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">4.7 (89 reviews)</span>
+                </div>
+                <Badge className="bg-purple-100 text-purple-700 mb-4">✅ Verified</Badge>
+                <Link to="/doctor/3">
+                  <Button variant="medical" size="sm" className="w-full">
+                    View Profile
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="text-center">
+            <Link to="/doctors">
+              <Button variant="outline" size="lg">
+                View All Doctors
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

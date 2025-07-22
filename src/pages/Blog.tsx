@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, ArrowRight, Search, Share2 } from "lucide-react";
 
 const blogPosts = [
   {
@@ -43,6 +46,18 @@ const blogPosts = [
 ];
 
 export default function Blog() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const categories = ["all", "Nutrition", "Mental Health", "Women's Health", "Chronic Disease"];
+  
+  const filteredPosts = blogPosts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="container py-8">
       <div className="max-w-6xl mx-auto">
@@ -53,8 +68,50 @@ export default function Blog() {
           </p>
         </div>
 
+        {/* Search and Filter */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="flex-1">
+            <Input 
+              placeholder="Search articles..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full md:w-48">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>
+                  {category === "all" ? "All Categories" : category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button variant="medical">
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {categories.map(category => (
+            <Button 
+              key={category}
+              variant={selectedCategory === category ? "medical" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category === "all" ? "All" : category}
+            </Button>
+          ))}
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {blogPosts.map((post) => (
+          {filteredPosts.map((post) => (
             <Card key={post.id} className="shadow-card hover:shadow-medical transition-all hover:scale-105">
               <div className="aspect-video overflow-hidden rounded-t-lg">
                 <img
@@ -89,20 +146,45 @@ export default function Blog() {
                     {new Date(post.date).toLocaleDateString()}
                   </div>
                   
-                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
-                    Read More
-                    <ArrowRight className="h-3 w-3 ml-1" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Share2 className="h-3 w-3" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
+                      Read More
+                      <ArrowRight className="h-3 w-3 ml-1" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {filteredPosts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No articles found matching your search.</p>
+          </div>
+        )}
+
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            View All Articles
+            Load More Articles
           </Button>
+        </div>
+
+        {/* Newsletter Signup */}
+        <div className="bg-muted/30 rounded-lg p-8 mt-16 text-center">
+          <h3 className="text-2xl font-bold mb-4">Stay Healthy with Our Newsletter</h3>
+          <p className="text-muted-foreground mb-6">
+            Get weekly health tips, latest articles, and exclusive content from Doctori AI
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <Input placeholder="Enter your email" className="flex-1" />
+            <Button variant="medical">
+              Subscribe
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DoctorMap, type Doctor } from "@/components/DoctorMap";
-import { MapPin, Star, Clock, Phone, Calendar, Heart } from "lucide-react";
+import { MapPin, Star, Clock, Phone, Calendar, Heart, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const doctors: Doctor[] = [
@@ -82,17 +82,17 @@ export default function Doctors() {
         {/* Search and Filters */}
         <Card className="shadow-card mb-8">
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2">
                 <Input 
-                  placeholder="Search by name, specialty..." 
+                  placeholder="Search by name, specialty, location..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
                 />
               </div>
               <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger>
                   <SelectValue placeholder="All Specialties" />
                 </SelectTrigger>
                 <SelectContent>
@@ -103,9 +103,33 @@ export default function Doctors() {
                   ))}
                 </SelectContent>
               </Select>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="Availability" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Time</SelectItem>
+                  <SelectItem value="today">Available Today</SelectItem>
+                  <SelectItem value="tomorrow">Available Tomorrow</SelectItem>
+                  <SelectItem value="week">This Week</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-4 mt-4">
+              <Select defaultValue="all">
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Rating</SelectItem>
+                  <SelectItem value="4.5">4.5+ Stars</SelectItem>
+                  <SelectItem value="4.0">4.0+ Stars</SelectItem>
+                  <SelectItem value="3.5">3.5+ Stars</SelectItem>
+                </SelectContent>
+              </Select>
               <Button variant="medical">
-                <Phone className="mr-2 h-4 w-4" />
-                Search
+                <Search className="mr-2 h-4 w-4" />
+                Apply Filters
               </Button>
             </div>
           </CardContent>
@@ -138,12 +162,21 @@ export default function Doctors() {
                     />
                     
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="text-xl font-semibold">{doctor.name}</h3>
-                          <Badge variant="secondary" className="mb-2">
-                            {doctor.specialty}
-                          </Badge>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary">
+                              {doctor.specialty}
+                            </Badge>
+                            {doctor.availability === "Available Today" && (
+                              <Badge className="bg-green-100 text-green-700">🟢 Available Today</Badge>
+                            )}
+                            {doctor.rating >= 4.8 && (
+                              <Badge className="bg-blue-100 text-blue-700">⭐ Top Rated</Badge>
+                            )}
+                            <Badge className="bg-purple-100 text-purple-700">✅ Verified</Badge>
+                          </div>
                         </div>
                         
                         <div className="flex items-center space-x-1">

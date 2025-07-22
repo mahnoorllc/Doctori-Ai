@@ -37,6 +37,15 @@ export const Navbar = () => {
           <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
             Contact
           </Link>
+        </div>
+
+        <div className="hidden md:flex items-center space-x-4">
+          <Link to="/login">
+            <Button variant="outline" size="sm">Sign In</Button>
+          </Link>
+          <Link to="/dashboard">
+            <Button variant="medical" size="sm">Dashboard</Button>
+          </Link>
           <Button variant="hero" size="sm">
             Start Chat
           </Button>
@@ -70,6 +79,12 @@ export const Navbar = () => {
               </Link>
               <Link to="/contact" className="block text-foreground hover:text-primary transition-colors">
                 Contact
+              </Link>
+              <Link to="/login" className="block text-foreground hover:text-primary transition-colors">
+                Sign In
+              </Link>
+              <Link to="/dashboard" className="block text-foreground hover:text-primary transition-colors">
+                Dashboard
               </Link>
               <Button variant="hero" size="sm" className="w-full">
                 Start Chat
