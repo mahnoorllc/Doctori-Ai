@@ -14,7 +14,201 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          role: string
+          session_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role: string
+          session_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          primary_symptoms: string[] | null
+          specialty_recommendation: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          urgency_level: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          primary_symptoms?: string[] | null
+          specialty_recommendation?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          primary_symptoms?: string[] | null
+          specialty_recommendation?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      medical_assessments: {
+        Row: {
+          assessment_data: Json | null
+          created_at: string | null
+          id: string
+          recommendations: string[] | null
+          session_id: string | null
+          symptoms: Json
+          urgency_score: number | null
+        }
+        Insert: {
+          assessment_data?: Json | null
+          created_at?: string | null
+          id?: string
+          recommendations?: string[] | null
+          session_id?: string | null
+          symptoms: Json
+          urgency_score?: number | null
+        }
+        Update: {
+          assessment_data?: Json | null
+          created_at?: string | null
+          id?: string
+          recommendations?: string[] | null
+          session_id?: string | null
+          symptoms?: Json
+          urgency_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_assessments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          allergies: string[] | null
+          created_at: string | null
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          medical_conditions: string[] | null
+          medications: string[] | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          allergies?: string[] | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          allergies?: string[] | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      visit_preparations: {
+        Row: {
+          created_at: string | null
+          id: string
+          medications_to_discuss: string[] | null
+          questions: string[] | null
+          session_id: string | null
+          summary: string
+          symptoms_timeline: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          medications_to_discuss?: string[] | null
+          questions?: string[] | null
+          session_id?: string | null
+          summary: string
+          symptoms_timeline?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          medications_to_discuss?: string[] | null
+          questions?: string[] | null
+          session_id?: string | null
+          summary?: string
+          symptoms_timeline?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_preparations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

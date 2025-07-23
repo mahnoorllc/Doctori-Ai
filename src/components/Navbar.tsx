@@ -1,10 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, Heart, Stethoscope } from "lucide-react";
+import { Menu, Heart, Stethoscope, LogOut, User } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Navbar = () => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,15 +48,30 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/login">
-            <Button variant="outline" size="sm">Sign In</Button>
-          </Link>
-          <Link to="/dashboard">
-            <Button variant="medical" size="sm">Dashboard</Button>
-          </Link>
-          <Button variant="hero" size="sm">
-            Start Chat
-          </Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground">Welcome back</span>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+              <Link to="/chat">
+                <Button variant="medical" size="sm">Start Chat</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="outline" size="sm">
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/chat">
+                <Button variant="hero" size="sm">Start Chat</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
