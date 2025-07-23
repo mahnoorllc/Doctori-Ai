@@ -43,18 +43,24 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="medical" size="lg" className="text-lg px-8">
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Start Chat
-                </Button>
-                <Button variant="hero" size="lg" className="text-lg px-8">
-                  <Search className="mr-2 h-5 w-5" />
-                  Find Doctors
-                </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8">
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Health Blog
-                </Button>
+                <Link to="/chat">
+                  <Button variant="medical" size="lg" className="text-lg px-8 w-full sm:w-auto">
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Start Chat
+                  </Button>
+                </Link>
+                <Link to="/doctors">
+                  <Button variant="hero" size="lg" className="text-lg px-8 w-full sm:w-auto">
+                    <Search className="mr-2 h-5 w-5" />
+                    Find Doctors
+                  </Button>
+                </Link>
+                <Link to="/blog">
+                  <Button variant="outline" size="lg" className="text-lg px-8 w-full sm:w-auto">
+                    <BookOpen className="mr-2 h-5 w-5" />
+                    Health Blog
+                  </Button>
+                </Link>
               </div>
             </div>
             
@@ -310,10 +316,12 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="medical" size="lg" className="text-lg px-8">
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Chat with AI Now
-            </Button>
+            <Link to="/chat">
+              <Button variant="medical" size="lg" className="text-lg px-8 w-full sm:w-auto">
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Chat with AI Now
+              </Button>
+            </Link>
             <Link to="/doctors">
               <Button variant="healing" size="lg" className="text-lg px-8 w-full sm:w-auto">
                 <Stethoscope className="mr-2 h-5 w-5" />

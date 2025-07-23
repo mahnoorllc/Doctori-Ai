@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
+import Chat from "./pages/Chat";
+import ChatSummary from "./pages/ChatSummary";
 import Doctors from "./pages/Doctors";
 import DoctorProfile from "./pages/DoctorProfile";
 import Blog from "./pages/Blog";
@@ -25,6 +28,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Index />} />
+            <Route path="chat" element={<Chat />} />
+            <Route path="chat-summary" element={<ChatSummary />} />
             <Route path="doctors" element={<Doctors />} />
             <Route path="doctor/:id" element={<DoctorProfile />} />
             <Route path="blog" element={<Blog />} />
