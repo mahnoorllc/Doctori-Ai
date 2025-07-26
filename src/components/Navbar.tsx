@@ -110,41 +110,19 @@ export const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          
-          <Link 
-            to="/about" 
-            className={`text-foreground hover:text-primary transition-colors ${
-              isActive('/about') ? 'text-primary' : ''
-            }`}
-          >
-            About
-          </Link>
-          <Link 
-            to="/contact" 
-            className={`text-foreground hover:text-primary transition-colors ${
-              isActive('/contact') ? 'text-primary' : ''
-            }`}
-          >
-            Contact
-          </Link>
         </div>
 
         {/* Language selector and Auth buttons */}
         <div className="hidden md:flex items-center space-x-2">
           <LanguageSelector />
           {user ? (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">Welcome back</span>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4" />
+            </Button>
           ) : (
             <Link to="/login">
               <Button variant="outline" size="sm">
-                <User className="h-4 w-4 mr-2" />
-                Sign In
+                <User className="h-4 w-4" />
               </Button>
             </Link>
           )}
@@ -224,34 +202,18 @@ export const Navbar = () => {
                   </Link>
                 </>
               )}
-              <Link 
-                to="/about" 
-                className="block text-foreground hover:text-primary transition-colors py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                to="/contact" 
-                className="block text-foreground hover:text-primary transition-colors py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                Contact
-              </Link>
               
               <div className="pt-4 border-t">
                 <LanguageSelector />
                 <div className="mt-3 space-y-2">
                   {user ? (
                     <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start">
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
+                      <LogOut className="h-4 w-4" />
                     </Button>
                   ) : (
                     <Link to="/login" className="block">
                       <Button variant="outline" size="sm" className="w-full justify-start">
-                        <User className="h-4 w-4 mr-2" />
-                        Sign In
+                        <User className="h-4 w-4" />
                       </Button>
                     </Link>
                   )}

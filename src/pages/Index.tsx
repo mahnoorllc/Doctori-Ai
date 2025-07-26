@@ -153,41 +153,47 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105">
-              <CardContent className="p-8 text-center">
-                <div className="bg-gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                  <Brain className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">AI Health Assistant</h3>
-                <p className="text-muted-foreground">
-                  Chat with our intelligent AI to understand symptoms and get personalized health guidance 24/7.
-                </p>
-              </CardContent>
-            </Card>
+            <Link to="/chat">
+              <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                    <Brain className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">AI Health Assistant</h3>
+                  <p className="text-muted-foreground">
+                    Chat with our intelligent AI to understand symptoms and get personalized health guidance 24/7.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105">
-              <CardContent className="p-8 text-center">
-                <div className="bg-gradient-healing p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                  <Users className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">Find Doctors</h3>
-                <p className="text-muted-foreground">
-                  Connect with verified healthcare professionals in your area and book appointments instantly.
-                </p>
-              </CardContent>
-            </Card>
+            <Link to="/doctors">
+              <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-gradient-healing p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">Find Doctors</h3>
+                  <p className="text-muted-foreground">
+                    Connect with verified healthcare professionals in your area and book appointments instantly.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105">
-              <CardContent className="p-8 text-center">
-                <div className="bg-gradient-to-br from-accent to-accent/80 p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                  <BookOpen className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">Health Education</h3>
-                <p className="text-muted-foreground">
-                  Stay informed with expert articles, tips, and resources for better health and wellness.
-                </p>
-              </CardContent>
-            </Card>
+            <Link to="/blog">
+              <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-gradient-to-br from-accent to-accent/80 p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">Health Education</h3>
+                  <p className="text-muted-foreground">
+                    Stay informed with expert articles, tips, and resources for better health and wellness.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
@@ -342,15 +348,17 @@ const Index = () => {
               { icon: Activity, label: "General Health", desc: "Common symptoms, wellness", color: "from-green-500 to-green-600" },
               { icon: Eye, label: "Preventive Care", desc: "Health screening, lifestyle", color: "from-blue-500 to-blue-600" }
             ].map((category, index) => (
-              <Card key={index} className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
-                <CardContent className="p-6 text-center">
-                  <div className={`bg-gradient-to-br ${category.color} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}>
-                    <category.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold mb-2">{category.label}</h3>
-                  <p className="text-sm text-muted-foreground">{category.desc}</p>
-                </CardContent>
-              </Card>
+              <Link key={index} to="/chat">
+                <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className={`bg-gradient-to-br ${category.color} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}>
+                      <category.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-semibold mb-2">{category.label}</h3>
+                    <p className="text-sm text-muted-foreground">{category.desc}</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
@@ -389,19 +397,21 @@ const Index = () => {
                 color: "bg-green-500"
               }
             ].map((tip, index) => (
-              <Card key={index} className="shadow-card hover:shadow-medical transition-all">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className={`${tip.color} p-3 rounded-full flex-shrink-0`}>
-                      <tip.icon className="h-5 w-5 text-white" />
+              <Link key={index} to="/blog">
+                <Card className="shadow-card hover:shadow-medical transition-all cursor-pointer">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className={`${tip.color} p-3 rounded-full flex-shrink-0`}>
+                        <tip.icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <Badge variant="secondary" className="mb-3">{tip.category}</Badge>
+                        <p className="text-muted-foreground leading-relaxed">{tip.tip}</p>
+                      </div>
                     </div>
-                    <div>
-                      <Badge variant="secondary" className="mb-3">{tip.category}</Badge>
-                      <p className="text-muted-foreground leading-relaxed">{tip.tip}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
           
