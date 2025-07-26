@@ -13,6 +13,7 @@ import Chat from "./pages/Chat";
 import ChatSummary from "./pages/ChatSummary";
 import Doctors from "./pages/Doctors";
 import DoctorProfile from "./pages/DoctorProfile";
+import Medicine from "./pages/Medicine";
 import Blog from "./pages/Blog";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="chat-summary" element={<ChatSummary />} />
             <Route path="doctors" element={<Doctors />} />
             <Route path="doctor/:id" element={<DoctorProfile />} />
+            <Route path="medicine" element={<Medicine />} />
             <Route path="blog" element={<Blog />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />

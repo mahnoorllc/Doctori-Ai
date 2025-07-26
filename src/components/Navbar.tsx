@@ -4,16 +4,17 @@ import { Button } from "@/components/ui/button";
 import { 
   Menu, 
   X, 
-  Heart, 
-  MessageCircle, 
-  Users, 
-  BookOpen, 
-  Info, 
-  Mail,
   LogOut,
   User,
-  Stethoscope
+  Stethoscope,
+  ChevronDown
 } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
@@ -53,10 +54,7 @@ export const Navbar = () => {
               isActive('/') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <Heart className="h-4 w-4" />
-              <span>Home</span>
-            </div>
+            Home
           </Link>
           <Link 
             to="/chat" 
@@ -64,10 +62,7 @@ export const Navbar = () => {
               isActive('/chat') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <MessageCircle className="h-4 w-4" />
-              <span>AI Chat</span>
-            </div>
+            AI Health Assistant
           </Link>
           <Link 
             to="/doctors" 
@@ -75,10 +70,15 @@ export const Navbar = () => {
               isActive('/doctors') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4" />
-              <span>Find Doctors</span>
-            </div>
+            Find Doctors
+          </Link>
+          <Link 
+            to="/medicine" 
+            className={`text-foreground hover:text-primary transition-colors ${
+              isActive('/medicine') ? 'text-primary' : ''
+            }`}
+          >
+            Search Medicine
           </Link>
           <Link 
             to="/blog" 
@@ -86,21 +86,38 @@ export const Navbar = () => {
               isActive('/blog') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <BookOpen className="h-4 w-4" />
-              <span>Health Blog</span>
-            </div>
+            Health Blog
           </Link>
+          
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-1">
+                  <span>Dashboard</span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard">User Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/doctor-dashboard">Doctor Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin">Admin Panel</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
           <Link 
             to="/about" 
             className={`text-foreground hover:text-primary transition-colors ${
               isActive('/about') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <Info className="h-4 w-4" />
-              <span>About</span>
-            </div>
+            About
           </Link>
           <Link 
             to="/contact" 
@@ -108,10 +125,7 @@ export const Navbar = () => {
               isActive('/contact') ? 'text-primary' : ''
             }`}
           >
-            <div className="flex items-center space-x-1">
-              <Mail className="h-4 w-4" />
-              <span>Contact</span>
-            </div>
+            Contact
           </Link>
         </div>
 
@@ -152,51 +166,77 @@ export const Navbar = () => {
             <div className="container py-4 space-y-4">
               <Link 
                 to="/" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <Heart className="h-4 w-4" />
-                <span>Home</span>
+                Home
               </Link>
               <Link 
                 to="/chat" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <MessageCircle className="h-4 w-4" />
-                <span>AI Chat</span>
+                AI Health Assistant
               </Link>
               <Link 
                 to="/doctors" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <Users className="h-4 w-4" />
-                <span>Find Doctors</span>
+                Find Doctors
+              </Link>
+              <Link 
+                to="/medicine" 
+                className="block text-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Search Medicine
               </Link>
               <Link 
                 to="/blog" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <BookOpen className="h-4 w-4" />
-                <span>Health Blog</span>
+                Health Blog
               </Link>
+              {user && (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className="block text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    User Dashboard
+                  </Link>
+                  <Link 
+                    to="/doctor-dashboard" 
+                    className="block text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Doctor Dashboard
+                  </Link>
+                  <Link 
+                    to="/admin" 
+                    className="block text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                </>
+              )}
               <Link 
                 to="/about" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <Info className="h-4 w-4" />
-                <span>About</span>
+                About
               </Link>
               <Link 
                 to="/contact" 
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                className="block text-foreground hover:text-primary transition-colors py-2"
                 onClick={() => setIsOpen(false)}
               >
-                <Mail className="h-4 w-4" />
-                <span>Contact</span>
+                Contact
               </Link>
               
               <div className="pt-4 border-t">

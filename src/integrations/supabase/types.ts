@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          created_at: string
+          doctor_id: string
+          id: string
+          notes: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -85,6 +118,48 @@ export type Database = {
         }
         Relationships: []
       }
+      doctors: {
+        Row: {
+          availability: Json | null
+          bio: string | null
+          consultation_fee: number | null
+          created_at: string
+          id: string
+          license_number: string | null
+          specialty: string
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+          years_experience: number | null
+        }
+        Insert: {
+          availability?: Json | null
+          bio?: string | null
+          consultation_fee?: number | null
+          created_at?: string
+          id?: string
+          license_number?: string | null
+          specialty: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+          years_experience?: number | null
+        }
+        Update: {
+          availability?: Json | null
+          bio?: string | null
+          consultation_fee?: number | null
+          created_at?: string
+          id?: string
+          license_number?: string | null
+          specialty?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       medical_assessments: {
         Row: {
           assessment_data: Json | null
@@ -123,6 +198,30 @@ export type Database = {
           },
         ]
       }
+      medicine_cache: {
+        Row: {
+          created_at: string
+          id: string
+          medicine_data: Json
+          medicine_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          medicine_data: Json
+          medicine_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          medicine_data?: Json
+          medicine_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           allergies: string[] | null
@@ -136,6 +235,7 @@ export type Database = {
           medical_conditions: string[] | null
           medications: string[] | null
           phone: string | null
+          role: string | null
           updated_at: string | null
         }
         Insert: {
@@ -150,6 +250,7 @@ export type Database = {
           medical_conditions?: string[] | null
           medications?: string[] | null
           phone?: string | null
+          role?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -164,6 +265,7 @@ export type Database = {
           medical_conditions?: string[] | null
           medications?: string[] | null
           phone?: string | null
+          role?: string | null
           updated_at?: string | null
         }
         Relationships: []
