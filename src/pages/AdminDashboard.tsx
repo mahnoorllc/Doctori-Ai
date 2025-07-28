@@ -1,19 +1,67 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { Users, Shield, FileText, BarChart3 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Users, Shield, FileText, BarChart3, Settings, Database, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import AdminAnalytics from "@/components/AdminAnalytics";
+import { toast } from "sonner";
+
+interface AdminStats {
+  totalUsers: number;
+  totalDoctors: number;
+  pendingVerifications: number;
+  activeSessions: number;
+}
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState<AdminStats>({
+    totalUsers: 0,
+    totalDoctors: 0,
+    pendingVerifications: 0,
+    activeSessions: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
       navigate('/login');
+    } else {
+      fetchAdminStats();
     }
   }, [user, navigate]);
+
+  const fetchAdminStats = async () => {
+    try {
+      const [usersRes, doctorsRes, sessionsRes] = await Promise.all([
+        supabase.from('profiles').select('*'),
+        supabase.from('doctors').select('*'),
+        supabase.from('chat_sessions').select('*').eq('status', 'active'),
+      ]);
+
+      if (usersRes.error) throw usersRes.error;
+      if (doctorsRes.error) throw doctorsRes.error;
+      if (sessionsRes.error) throw sessionsRes.error;
+
+      const pendingVerifications = doctorsRes.data?.filter(d => !d.verified).length || 0;
+
+      setStats({
+        totalUsers: usersRes.data?.length || 0,
+        totalDoctors: doctorsRes.data?.length || 0,
+        pendingVerifications,
+        activeSessions: sessionsRes.data?.length || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      toast.error('Failed to load admin statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) {
     return null;
