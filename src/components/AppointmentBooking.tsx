@@ -78,22 +78,31 @@ export const AppointmentBooking: React.FC<AppointmentBookingProps> = ({
 
   const fetchDoctors = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: doctorData, error: doctorError } = await supabase
         .from('doctors')
-        .select(`
-          id,
-          user_id,
-          specialty,
-          consultation_fee,
-          profiles!doctors_user_id_fkey (
-            first_name,
-            last_name
-          )
-        `)
+        .select('id, user_id, specialty, consultation_fee')
         .eq('verified', true);
 
-      if (error) throw error;
-      setDoctors(data || []);
+      if (doctorError) throw doctorError;
+
+      if (doctorData) {
+        // Fetch profile data separately
+        const userIds = doctorData.map(doctor => doctor.user_id);
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', userIds);
+
+        if (profileError) throw profileError;
+
+        // Combine the data
+        const doctorsWithProfiles = doctorData.map(doctor => ({
+          ...doctor,
+          profiles: profileData?.find(profile => profile.id === doctor.user_id) || { first_name: '', last_name: '' }
+        }));
+
+        setDoctors(doctorsWithProfiles);
+      }
     } catch (error) {
       console.error('Error fetching doctors:', error);
       toast.error('Failed to load doctors');

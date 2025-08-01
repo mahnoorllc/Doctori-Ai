@@ -75,35 +75,53 @@ const DoctorDashboard = () => {
       // Fetch doctor's appointments
       const { data: appointmentData, error: appointmentError } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          profiles!appointments_user_id_fkey (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('doctor_id', user.id)
         .order('appointment_date', { ascending: true });
 
       if (appointmentError) throw appointmentError;
 
-      // Fetch chat sessions (you might need to create a relationship)
+      // Fetch chat sessions
       const { data: chatData, error: chatError } = await supabase
         .from('chat_sessions')
-        .select(`
-          *,
-          profiles!chat_sessions_user_id_fkey (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (chatError) throw chatError;
 
-      setAppointments(appointmentData || []);
-      setChatSessions(chatData || []);
+      // Fetch profile data for appointments
+      let appointmentsWithProfiles: Appointment[] = [];
+      if (appointmentData && appointmentData.length > 0) {
+        const userIds = appointmentData.map(apt => apt.user_id);
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', userIds);
+
+        appointmentsWithProfiles = appointmentData.map(appointment => ({
+          ...appointment,
+          profiles: profileData?.find(profile => profile.id === appointment.user_id) || { first_name: '', last_name: '' }
+        }));
+      }
+
+      // Fetch profile data for chat sessions
+      let chatSessionsWithProfiles: ChatSession[] = [];
+      if (chatData && chatData.length > 0) {
+        const chatUserIds = chatData.map(chat => chat.user_id);
+        const { data: chatProfileData } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', chatUserIds);
+
+        chatSessionsWithProfiles = chatData.map(session => ({
+          ...session,
+          profiles: chatProfileData?.find(profile => profile.id === session.user_id) || { first_name: '', last_name: '' }
+        }));
+      }
+
+      setAppointments(appointmentsWithProfiles);
+      setChatSessions(chatSessionsWithProfiles);
 
       // Calculate stats
       const today = moment().format('YYYY-MM-DD');
