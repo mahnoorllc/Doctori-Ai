@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,29 +27,25 @@ const Chat = () => {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-
+  
+  // Use guest chat by default, authenticated chat when logged in
   const authenticatedChat = useChatSession();
   const guestChat = useGuestChat();
-
+  
   const isAuthenticated = user && !loading;
   const chat = isAuthenticated ? authenticatedChat : guestChat;
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!loading) {
       const welcomeMessage = t('chat.welcome');
       chat.initializeChat(welcomeMessage);
     }
-  }, [loading, chat, t]);
+  }, [loading, chat.initializeChat, t]);
 
   const handleSendMessage = () => {
-    if (!inputRef.current) return;
-
-    const content = inputRef.current.value.trim();
+    const inputElement = document.querySelector('textarea') as HTMLTextAreaElement;
+    const content = inputElement?.value.trim();
     if (!content) return;
-
-    console.log("Sending message:", content);
 
     if (!isHealthRelated(content)) {
       chat.addMessage({
@@ -59,12 +55,12 @@ const Chat = () => {
         timestamp: new Date(),
         isUrgent: false,
       });
-      inputRef.current.value = '';
+      inputElement.value = '';
       return;
     }
 
     chat.sendMessage(content);
-    inputRef.current.value = '';
+    inputElement.value = '';
   };
 
   const handleViewSummary = () => {
@@ -113,7 +109,7 @@ const Chat = () => {
               </div>
             )}
           </CardHeader>
-
+          
           <CardContent className="p-0 flex flex-col h-[calc(100vh-12rem)] md:h-auto">
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 min-h-[300px] md:h-96">
@@ -155,7 +151,7 @@ const Chat = () => {
                   </div>
                 </div>
               ))}
-
+              
               {chat.sessionState.isLoading && (
                 <div className="flex items-center space-x-2">
                   <div className="bg-muted p-2 rounded-full">
@@ -176,19 +172,19 @@ const Chat = () => {
             <div className="p-4 md:p-6 border-t">
               {chat.sessionState.phase === "summary" || ('requiresAuth' in chat.sessionState && chat.sessionState.requiresAuth) ? (
                 <div className="space-y-4">
-                  <Button
+                  <Button 
                     onClick={handleViewSummary}
-                    variant="default"
-                    size="lg"
+                    variant="default" 
+                    size="lg" 
                     className="w-full text-sm md:text-base"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    {isAuthenticated
-                      ? 'View Your Health Summary & Recommended Doctors'
-                      : 'Get Your Health Summary (Login Required)'
+                    {isAuthenticated ? 
+                      'View Your Health Summary & Recommended Doctors' : 
+                      'Get Your Health Summary (Login Required)'
                     }
                   </Button>
-
+                  
                   {/* Emergency Call Button - Always Visible */}
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <div className="flex items-center justify-center space-x-2 mb-2">
@@ -198,9 +194,9 @@ const Chat = () => {
                     <p className="text-red-700 text-xs md:text-sm text-center mb-3">
                       If you're experiencing a medical emergency, call 911 immediately
                     </p>
-                    <Button
-                      variant="destructive"
-                      size="sm"
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
                       className="w-full"
                       onClick={() => window.open('tel:911')}
                     >
@@ -221,9 +217,9 @@ const Chat = () => {
                       <p className="text-red-700 text-xs md:text-sm mb-3">
                         Based on your symptoms, please seek immediate medical care. Call 911 or go to the nearest emergency room.
                       </p>
-                      <Button
-                        variant="destructive"
-                        size="sm"
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
                         className="w-full"
                         onClick={() => window.open('tel:911')}
                       >
@@ -232,18 +228,17 @@ const Chat = () => {
                       </Button>
                     </div>
                   )}
-
+                  
                   <div className="flex space-x-2">
                     <Textarea
-                      ref={inputRef}
                       onKeyPress={handleKeyPress}
                       placeholder="Describe your symptoms in detail... (e.g., 'I have chest pain that started 2 hours ago')"
                       className="flex-1 min-h-[60px] text-sm md:text-base resize-none"
                       disabled={chat.sessionState.isLoading}
                     />
-                    <Button
+                    <Button 
                       onClick={handleSendMessage}
-                      variant="default"
+                      variant="default" 
                       size="icon"
                       className="self-end h-[60px] w-12 md:w-14"
                       disabled={chat.sessionState.isLoading}
@@ -251,7 +246,7 @@ const Chat = () => {
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
-
+                  
                   {/* Medical Disclaimer - Always Visible */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <div className="text-center">
@@ -283,20 +278,20 @@ const Chat = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col space-y-3">
-            <Button
+            <Button 
               onClick={() => navigate('/login')}
               className="w-full"
             >
               {t('auth.login')}
             </Button>
-            <Button
+            <Button 
               onClick={() => navigate('/login')}
               variant="outline"
               className="w-full"
             >
               {t('auth.signup')}
             </Button>
-            <Button
+            <Button 
               onClick={() => setShowAuthDialog(false)}
               variant="ghost"
               className="w-full"
