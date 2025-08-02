@@ -11,17 +11,6 @@ import { useGuestChat } from "@/hooks/useGuestChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const healthKeywords = [
-  "symptom", "pain", "fever", "rash", "headache", "doctor", "clinic", "cough",
-  "medicine", "medication", "injury", "health", "wellness", "mental", "hospital",
-  "appointment", "diagnosis", "treatment", "therapist", "nutrition", "fatigue"
-];
-
-function isHealthRelated(input: string): boolean {
-  const lowerInput = input.toLowerCase();
-  return healthKeywords.some(word => lowerInput.includes(word));
-}
-
 const Chat = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -46,19 +35,7 @@ const Chat = () => {
     const inputElement = document.querySelector('textarea') as HTMLTextAreaElement;
     const content = inputElement?.value.trim();
     if (!content) return;
-
-    if (!isHealthRelated(content)) {
-      chat.addMessage({
-        id: Date.now().toString(),
-        role: "assistant",
-        content: "🩺 I'm here to help with your health. Please ask a health-related question.",
-        timestamp: new Date(),
-        isUrgent: false,
-      });
-      inputElement.value = '';
-      return;
-    }
-
+    
     chat.sendMessage(content);
     inputElement.value = '';
   };
