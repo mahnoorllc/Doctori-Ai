@@ -125,16 +125,30 @@ export const useChatSession = () => {
     // Save user message
     await saveMessage(content, 'user');
 
-    // Process the message based on current phase
-    setTimeout(async () => {
-      let aiResponse = '';
+    try {
+      // Call our secure AI chat assistant
+      const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
+        body: {
+          userMessage: content,
+          messages: sessionState.messages,
+          sessionContext: {
+            phase: sessionState.phase,
+            symptoms: sessionState.symptoms,
+            urgencyLevel: sessionState.urgencyLevel,
+            followupAnswers: sessionState.followupAnswers,
+            sessionId: sessionId
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      let aiResponse = data.response;
       let newState = { ...sessionState };
 
+      // Basic symptom analysis for urgency detection and database updates
+      const analysis = analyzeSymptoms(content);
       if (sessionState.phase === 'initial') {
-        // Analyze symptoms
-        const analysis = analyzeSymptoms(content);
-        const disclaimer = getMedicalDisclaimer(analysis.urgencyLevel);
-        
         newState = {
           ...sessionState,
           phase: 'assessment',
@@ -143,14 +157,6 @@ export const useChatSession = () => {
           specialtyRecommendation: analysis.specialtyRecommendation,
           currentQuestionIndex: 0
         };
-
-        if (analysis.urgencyLevel === 'emergency') {
-          aiResponse = `${disclaimer.text}\n\nBased on your symptoms, this could be a medical emergency. Please seek immediate medical attention by calling 911 or going to the nearest emergency room. Do not delay seeking care.`;
-        } else if (analysis.urgencyLevel === 'high') {
-          aiResponse = `${disclaimer.text}\n\nBased on your symptoms, you should seek urgent medical care. I recommend contacting your healthcare provider immediately or visiting urgent care. Let me ask a few quick questions to better understand your situation: ${analysis.questionsToAsk[0]}`;
-        } else {
-          aiResponse = `${disclaimer.text}\n\nI understand you're experiencing ${analysis.symptoms.length > 0 ? analysis.symptoms.join(', ') : 'these symptoms'}. To provide better guidance, I need to ask a few questions. ${analysis.questionsToAsk[0]}`;
-        }
 
         // Update session in database
         await supabase
@@ -163,19 +169,12 @@ export const useChatSession = () => {
           .eq('id', sessionId);
 
       } else if (sessionState.phase === 'assessment') {
-        // Save follow-up answer
         newState.followupAnswers[sessionState.currentQuestionIndex.toString()] = content;
+        newState.currentQuestionIndex = sessionState.currentQuestionIndex + 1;
         
-        const analysis = analyzeSymptoms(sessionState.symptoms.join(' '));
-        
-        if (sessionState.currentQuestionIndex < analysis.questionsToAsk.length - 1) {
-          newState.currentQuestionIndex = sessionState.currentQuestionIndex + 1;
-          aiResponse = analysis.questionsToAsk[newState.currentQuestionIndex];
-        } else {
+        if (newState.currentQuestionIndex >= 3) {
           newState.phase = 'analysis';
-          aiResponse = 'Thank you for providing that information. Let me analyze your symptoms and prepare a comprehensive summary with recommendations...';
-          
-          // Generate assessment
+          // Generate comprehensive assessment after getting enough info
           setTimeout(() => {
             generateAssessment(newState);
           }, 2000);
@@ -198,7 +197,37 @@ export const useChatSession = () => {
 
       // Save AI message
       await saveMessage(aiResponse, 'assistant', { urgencyLevel: newState.urgencyLevel });
-    }, 1500);
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Fallback response
+      const fallbackMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: `I'm sorry, I'm having trouble processing your request right now.
+
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call 911 immediately.
+
+ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
+
+This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`,
+        role: 'assistant',
+        timestamp: new Date(),
+        isUrgent: false
+      };
+
+      setSessionState(prev => ({
+        ...prev,
+        messages: [...prev.messages, fallbackMessage],
+        isLoading: false
+      }));
+
+      toast({
+        title: "Connection Issue",
+        description: "Unable to connect to AI assistant. Please try again.",
+        variant: "destructive"
+      });
+    }
   }, [user, sessionState, createSession, saveMessage, toast]);
 
   const generateAssessment = useCallback(async (state: ChatSessionState) => {
@@ -268,9 +297,19 @@ export const useChatSession = () => {
   }, [user, toast]);
 
   const initializeChat = useCallback(() => {
+    const professionalWelcome = `Hello! I'm Doctori AI, your caring virtual health assistant. 🩺
+
+Welcome to your personalized health consultation. I'm here to help you understand your symptoms and guide you toward appropriate medical care. Please feel free to describe your symptoms or health concerns in as much detail as you're comfortable sharing.
+
+⚠️ **IMPORTANT EMERGENCY NOTICE**: If you're experiencing a medical emergency (chest pain, difficulty breathing, severe bleeding, etc.), please call 911 immediately or go to your nearest emergency room.
+
+ℹ️ **Medical Disclaimer**: I provide general health information only and am not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for personal health concerns.
+
+As a registered user, I'll be able to save our conversation and provide you with a comprehensive health summary and doctor visit preparation guide. What brings you here today? I'm listening and ready to help. 💙`;
+
     const welcomeMessage: ChatMessage = {
       id: 'welcome',
-      content: "Hello! I'm Doctori AI, your personal health assistant. I'm here to help you understand your symptoms and connect you with the right healthcare providers. Please describe your symptoms or health concerns in detail.\n\n⚠️ Remember: This is not medical advice and should not replace professional medical care. In case of emergency, please call 911 immediately.",
+      content: professionalWelcome,
       role: 'assistant',
       timestamp: new Date()
     };

@@ -67,29 +67,29 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/20 py-8">
+    <div className="min-h-screen bg-muted/20 py-4 md:py-8 px-4 md:px-0">
       <div className="container max-w-4xl mx-auto">
-        <Card className="shadow-medical">
-          <CardHeader className="bg-gradient-primary text-white">
-            <CardTitle className="flex items-center space-x-2">
-              <MessageCircle className="h-6 w-6" />
-              <span>{t('chat.title')}</span>
+        <Card className="shadow-medical h-[calc(100vh-2rem)] md:h-auto">
+          <CardHeader className="bg-gradient-primary text-white p-4 md:p-6">
+            <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+              <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
+              <span>Doctori AI Health Assistant</span>
             </CardTitle>
-            <p className="text-white/90 text-sm">
-              {t('chat.subtitle')}
+            <p className="text-white/90 text-sm md:text-base">
+              Professional health guidance with compassionate care
             </p>
             {!isAuthenticated && (
               <div className="bg-white/10 rounded-lg p-3 mt-2">
-                <p className="text-white/90 text-sm">
-                  💡 You're chatting as a guest. {t('auth.loginMessage')}
+                <p className="text-white/90 text-xs md:text-sm">
+                  💡 You're chatting as a guest. Create an account to save your health summary and get personalized doctor recommendations.
                 </p>
               </div>
             )}
           </CardHeader>
           
-          <CardContent className="p-0">
+          <CardContent className="p-0 flex flex-col h-[calc(100vh-12rem)] md:h-auto">
             {/* Chat Messages */}
-            <div className="h-96 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 min-h-[300px] md:h-96">
               {chat.sessionState.messages.map((message) => (
                 <div
                   key={message.id}
@@ -146,14 +146,14 @@ const Chat = () => {
             </div>
 
             {/* Input Area */}
-            <div className="p-6 border-t">
+            <div className="p-4 md:p-6 border-t">
               {chat.sessionState.phase === "summary" || ('requiresAuth' in chat.sessionState && chat.sessionState.requiresAuth) ? (
                 <div className="space-y-4">
                   <Button 
                     onClick={handleViewSummary}
                     variant="default" 
                     size="lg" 
-                    className="w-full"
+                    className="w-full text-sm md:text-base"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     {isAuthenticated ? 
@@ -161,52 +161,79 @@ const Chat = () => {
                       'Get Your Health Summary (Login Required)'
                     }
                   </Button>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {t('chat.emergency')}
+                  
+                  {/* Emergency Call Button - Always Visible */}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600" />
+                      <span className="text-red-800 font-semibold text-sm">EMERGENCY</span>
+                    </div>
+                    <p className="text-red-700 text-xs md:text-sm text-center mb-3">
+                      If you're experiencing a medical emergency, call 911 immediately
                     </p>
-                    <Button variant="destructive" size="sm">
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => window.open('tel:911')}
+                    >
                       <Phone className="h-4 w-4 mr-2" />
-                      {t('chat.call911')}
+                      Call 911 Emergency
                     </Button>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Emergency Alert - Always Visible */}
+                  {(chat.sessionState.urgencyLevel === "high" || chat.sessionState.urgencyLevel === "emergency") && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                        <span className="text-red-800 font-semibold text-sm">URGENT MEDICAL ATTENTION NEEDED</span>
+                      </div>
+                      <p className="text-red-700 text-xs md:text-sm mb-3">
+                        Based on your symptoms, please seek immediate medical care. Call 911 or go to the nearest emergency room.
+                      </p>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => window.open('tel:911')}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call 911 Emergency
+                      </Button>
+                    </div>
+                  )}
+                  
                   <div className="flex space-x-2">
                     <Textarea
                       onKeyPress={handleKeyPress}
-                      placeholder={t('chat.placeholder')}
-                      className="flex-1 min-h-[60px]"
+                      placeholder="Describe your symptoms in detail... (e.g., 'I have chest pain that started 2 hours ago')"
+                      className="flex-1 min-h-[60px] text-sm md:text-base resize-none"
                       disabled={chat.sessionState.isLoading}
                     />
                     <Button 
                       onClick={handleSendMessage}
                       variant="default" 
                       size="icon"
-                      className="self-end"
+                      className="self-end h-[60px] w-12 md:w-14"
                       disabled={chat.sessionState.isLoading}
                     >
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
                   
-                  {(chat.sessionState.urgencyLevel === "high" || chat.sessionState.urgencyLevel === "emergency") && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="flex items-center space-x-2">
-                        <AlertTriangle className="h-5 w-5 text-red-600" />
-                        <span className="text-red-800 font-semibold">Emergency Alert</span>
-                      </div>
-                      <p className="text-red-700 text-sm mt-1">
-                        If you're experiencing a medical emergency, please call 911 immediately.
+                  {/* Medical Disclaimer - Always Visible */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="text-center">
+                      <p className="text-xs md:text-sm text-blue-800 mb-1">
+                        ℹ️ <strong>Medical Disclaimer</strong>
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        This AI provides general health information only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for personal health concerns.
                       </p>
                     </div>
-                  )}
-                  
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">
-                      {t('chat.disclaimer')}
-                    </p>
                   </div>
                 </div>
               )}
