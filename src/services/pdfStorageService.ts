@@ -29,18 +29,18 @@ export class PDFStorageService {
         .from('medical-reports')
         .getPublicUrl(filePath);
 
-      // Save metadata to database
-      await supabase
-        .from('medical_reports')
-        .insert([{
-          user_id: userId,
-          session_id: sessionId,
-          filename: filename,
-          file_path: filePath,
-          file_url: publicData.publicUrl,
-          report_type: filename.includes('health-report') ? 'health_report' : 'chat_summary',
-          created_at: new Date().toISOString()
-        }]);
+      // TODO: Save metadata to database once medical_reports table is created
+      // await supabase
+      //   .from('medical_reports')
+      //   .insert([{
+      //     user_id: userId,
+      //     session_id: sessionId,
+      //     filename: filename,
+      //     file_path: filePath,
+      //     file_url: publicData.publicUrl,
+      //     report_type: filename.includes('health-report') ? 'health_report' : 'chat_summary',
+      //     created_at: new Date().toISOString()
+      //   }]);
 
       return publicData.publicUrl;
     } catch (error) {
@@ -84,16 +84,18 @@ export class PDFStorageService {
     appointmentId?: string
   ): Promise<boolean> {
     try {
-      await supabase
-        .from('shared_reports')
-        .insert([{
-          pdf_url: pdfUrl,
-          doctor_id: doctorId,
-          patient_id: patientId,
-          appointment_id: appointmentId,
-          shared_at: new Date().toISOString()
-        }]);
+      // TODO: Implement once shared_reports table is created
+      // await supabase
+      //   .from('shared_reports')
+      //   .insert([{
+      //     pdf_url: pdfUrl,
+      //     doctor_id: doctorId,
+      //     patient_id: patientId,
+      //     appointment_id: appointmentId,
+      //     shared_at: new Date().toISOString()
+      //   }]);
 
+      console.log('PDF sharing will be implemented after database migration');
       return true;
     } catch (error) {
       console.error('Error sharing PDF with doctor:', error);
@@ -103,18 +105,21 @@ export class PDFStorageService {
 
   static async getUserReports(userId: string): Promise<any[]> {
     try {
-      const { data, error } = await supabase
-        .from('medical_reports')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+      // TODO: Implement once medical_reports table is created
+      // const { data, error } = await supabase
+      //   .from('medical_reports')
+      //   .select('*')
+      //   .eq('user_id', userId)
+      //   .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching user reports:', error);
-        return [];
-      }
+      // if (error) {
+      //   console.error('Error fetching user reports:', error);
+      //   return [];
+      // }
 
-      return data || [];
+      // return data || [];
+      console.log('User reports will be available after database migration');
+      return [];
     } catch (error) {
       console.error('Error in getUserReports:', error);
       return [];

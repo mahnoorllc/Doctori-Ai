@@ -43,7 +43,7 @@ export const TermsOfServiceModal = ({ isOpen, onAccept }: TermsOfServiceModalPro
             <Checkbox 
               id="terms-agreement"
               checked={isChecked}
-              onCheckedChange={setIsChecked}
+              onCheckedChange={(checked) => setIsChecked(checked === true)}
               className="mt-1"
             />
             <label 

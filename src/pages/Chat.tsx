@@ -10,6 +10,9 @@ import { useChatSession } from "@/hooks/useChatSession";
 import { useGuestChat } from "@/hooks/useGuestChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { isHealthRelated, getHealthFilterResponse } from '@/hooks/useHealthTopicFilter';
+import { TermsOfServiceModal } from '@/components/TermsOfServiceModal';
+import { MedicalDisclaimer } from '@/components/MedicalDisclaimer';
 
 const Chat = () => {
   const navigate = useNavigate();
