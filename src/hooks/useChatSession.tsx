@@ -297,7 +297,7 @@ This is not medical advice. Always consult with a qualified healthcare provider 
   }, [user, toast]);
 
   const initializeChat = useCallback(() => {
-    const professionalWelcome = `Hello! I'm Doctori AI, your caring virtual health assistant. 🩺
+    const professionalWelcome = `Hello! I'm Doctor AI, your caring virtual health assistant. 🩺
 
 Welcome to your personalized health consultation. I'm here to help you understand your symptoms and guide you toward appropriate medical care. Please feel free to describe your symptoms or health concerns in as much detail as you're comfortable sharing.
 
@@ -305,7 +305,7 @@ Welcome to your personalized health consultation. I'm here to help you understan
 
 ℹ️ **Medical Disclaimer**: I provide general health information only and am not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for personal health concerns.
 
-As a registered user, I'll be able to save our conversation and provide you with a comprehensive health summary and doctor visit preparation guide. What brings you here today? I'm listening and ready to help. 💙`;
+As a registered user, I'll be able to save our conversation and provide you with a comprehensive health summary and doctor visit preparation guide. What brings you here today? I'm listening and ready to help guide you toward the right care. 💙`;
 
     const welcomeMessage: ChatMessage = {
       id: 'welcome',

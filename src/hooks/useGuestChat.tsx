@@ -172,7 +172,7 @@ This is not medical advice. Always consult with a qualified healthcare provider 
   }, [sessionState, toast]);
 
   const initializeChat = useCallback((welcomeMessage: string) => {
-    const professionalWelcome = `Hello! I'm Doctori AI, your caring virtual health assistant. 🩺
+    const professionalWelcome = `Hello! I'm Doctor AI, your caring virtual health assistant. 🩺
 
 I'm here to help you understand your symptoms and guide you toward appropriate medical care. Please feel free to describe your symptoms or health concerns in as much detail as you're comfortable sharing.
 

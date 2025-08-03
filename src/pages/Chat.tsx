@@ -35,6 +35,24 @@ const Chat = () => {
     const inputElement = document.querySelector('textarea') as HTMLTextAreaElement;
     const content = inputElement?.value.trim();
     if (!content) return;
+
+    // Check if the message is health-related
+    if (!isHealthRelated(content)) {
+      // Add filter response as assistant message
+      const filterMessage = {
+        id: Date.now().toString(),
+        content: getHealthFilterResponse(),
+        role: 'assistant' as const,
+        timestamp: new Date(),
+        isUrgent: false
+      };
+      
+      // Add the message to state (this is a simplified approach)
+      // In a real implementation, you'd want to update the chat state properly
+      chat.sendMessage("__FILTER_RESPONSE__" + content);
+      inputElement.value = '';
+      return;
+    }
     
     chat.sendMessage(content);
     inputElement.value = '';
