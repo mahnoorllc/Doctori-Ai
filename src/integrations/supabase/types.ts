@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -118,14 +157,77 @@ export type Database = {
         }
         Relationships: []
       }
+      chats: {
+        Row: {
+          age: number | null
+          answers: Json
+          completed_at: string | null
+          created_at: string
+          gender: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          gender?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          gender?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      consent_records: {
+        Row: {
+          consent_type: string
+          consented_at: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_type?: string
+          consented_at?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_type?: string
+          consented_at?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
+          approved: boolean | null
           availability: Json | null
           bio: string | null
           consultation_fee: number | null
           created_at: string
+          experience: number | null
           id: string
           license_number: string | null
+          photo_url: string | null
           specialty: string
           updated_at: string
           user_id: string
@@ -133,12 +235,15 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          approved?: boolean | null
           availability?: Json | null
           bio?: string | null
           consultation_fee?: number | null
           created_at?: string
+          experience?: number | null
           id?: string
           license_number?: string | null
+          photo_url?: string | null
           specialty: string
           updated_at?: string
           user_id: string
@@ -146,12 +251,15 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          approved?: boolean | null
           availability?: Json | null
           bio?: string | null
           consultation_fee?: number | null
           created_at?: string
+          experience?: number | null
           id?: string
           license_number?: string | null
+          photo_url?: string | null
           specialty?: string
           updated_at?: string
           user_id?: string
@@ -224,46 +332,55 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           allergies: string[] | null
           created_at: string | null
           date_of_birth: string | null
           email: string | null
           emergency_contact: string | null
           first_name: string | null
+          gender: string | null
           id: string
           last_name: string | null
           medical_conditions: string[] | null
           medications: string[] | null
+          name: string | null
           phone: string | null
           role: string | null
           updated_at: string | null
         }
         Insert: {
+          age?: number | null
           allergies?: string[] | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           emergency_contact?: string | null
           first_name?: string | null
+          gender?: string | null
           id: string
           last_name?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          name?: string | null
           phone?: string | null
           role?: string | null
           updated_at?: string | null
         }
         Update: {
+          age?: number | null
           allergies?: string[] | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           emergency_contact?: string | null
           first_name?: string | null
+          gender?: string | null
           id?: string
           last_name?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          name?: string | null
           phone?: string | null
           role?: string | null
           updated_at?: string | null
@@ -316,7 +433,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
