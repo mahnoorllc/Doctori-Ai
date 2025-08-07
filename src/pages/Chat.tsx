@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ConsentScreen } from '@/components/ConsentScreen';
-import { StructuredChatInterface } from '@/components/StructuredChatInterface';
+import { IntelligentChatInterface } from '@/components/IntelligentChatInterface';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -89,11 +88,8 @@ const Chat = () => {
     );
   }
 
-  if (!hasConsented) {
-    return <ConsentScreen onConsent={handleConsent} />;
-  }
-
-  return <StructuredChatInterface />;
+  // Consent is now handled within the intelligent chat interface
+  return <IntelligentChatInterface />;
 };
 
 export default Chat;
