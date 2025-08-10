@@ -1,11 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, Clock, Phone, Navigation } from "lucide-react";
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Card } from "@/components/ui/card";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-interface Doctor {
+// Fix default icon paths for Leaflet in Vite
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+export interface Doctor {
   id: number;
   name: string;
   specialty: string;
@@ -20,98 +29,52 @@ interface Doctor {
   phone: string;
 }
 
-const DoctorMap = ({ doctors, onDoctorSelect }: { doctors: Doctor[], onDoctorSelect: (doctor: Doctor) => void }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [showTokenInput, setShowTokenInput] = useState(true);
-
-  const initializeMap = () => {
-    if (!mapboxToken) {
-      setShowTokenInput(true);
-      return;
-    }
-
-    if (!mapContainer.current) return;
-
-    // Simple map placeholder for now - in production, this would use the actual Mapbox API
-    const mapElement = mapContainer.current;
-    mapElement.innerHTML = `
-      <div class="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-        <div class="text-center p-8">
-          <div class="text-4xl mb-4">🗺️</div>
-          <h3 class="text-lg font-semibold mb-2">Interactive Map</h3>
-          <p class="text-sm text-muted-foreground mb-4">Showing ${doctors.length} doctors in your area</p>
-          <div class="space-y-2">
-            ${doctors.map(doctor => `
-              <button 
-                onclick="window.selectDoctor(${doctor.id})" 
-                class="block w-full p-2 text-left hover:bg-primary/5 rounded text-sm border"
-              >
-                📍 ${doctor.name} - ${doctor.location}
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Add global function for doctor selection
-    (window as any).selectDoctor = (doctorId: number) => {
-      const doctor = doctors.find(d => d.id === doctorId);
-      if (doctor) onDoctorSelect(doctor);
-    };
-  };
-
+const FitBounds: React.FC<{ positions: [number, number][] }>
+= ({ positions }) => {
+  const map = useMap();
   useEffect(() => {
-    if (mapboxToken) {
-      initializeMap();
-      setShowTokenInput(false);
-    }
-  }, [mapboxToken, doctors]);
+    if (!positions.length) return;
+    const bounds = L.latLngBounds(positions.map(([lng, lat]) => [lat, lng]));
+    map.fitBounds(bounds, { padding: [30, 30] });
+  }, [positions, map]);
+  return null;
+};
 
-  if (showTokenInput) {
-    return (
-      <Card className="h-full shadow-card">
-        <CardContent className="p-6 h-full flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="text-4xl mb-4">🗺️</div>
-            <h3 className="text-lg font-semibold mb-4">Map Integration</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              To enable interactive maps, please enter your Mapbox public token.
-              Get yours free at <a href="https://mapbox.com" target="_blank" className="text-primary hover:underline">mapbox.com</a>
-            </p>
-            <div className="space-y-3">
-              <Input
-                placeholder="Enter Mapbox public token..."
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <Button 
-                  variant="medical" 
-                  onClick={() => mapboxToken && initializeMap()}
-                  disabled={!mapboxToken}
-                  className="flex-1"
-                >
-                  Enable Map
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowTokenInput(false)}
-                >
-                  Skip for now
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+const DoctorMap = ({ doctors, onDoctorSelect }: { doctors: Doctor[], onDoctorSelect: (doctor: Doctor) => void }) => {
+  const positions = useMemo(() => doctors.map(d => d.coordinates), [doctors]);
+  const center = useMemo(() => {
+    if (!positions.length) return { lat: 23.8103, lng: 90.4125 }; // Dhaka fallback
+    const avg = positions.reduce((acc, [lng, lat]) => ({ lat: acc.lat + lat, lng: acc.lng + lng }), { lat: 0, lng: 0 });
+    return { lat: avg.lat / positions.length, lng: avg.lng / positions.length };
+  }, [positions]);
 
   return (
     <Card className="h-full shadow-card">
-      <div ref={mapContainer} className="h-full min-h-[400px] rounded-lg" />
+      <MapContainer
+        center={[center.lat, center.lng]}
+        zoom={12}
+        style={{ height: '400px', width: '100%', borderRadius: '0.5rem' }}
+        scrollWheelZoom={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <FitBounds positions={positions} />
+        {doctors.map((doctor) => (
+          <Marker key={doctor.id} position={[doctor.coordinates[1], doctor.coordinates[0]]}
+            eventHandlers={{ click: () => onDoctorSelect(doctor) }}
+          >
+            <Popup>
+              <div className="space-y-1">
+                <p className="font-semibold">{doctor.name}</p>
+                <p className="text-sm">{doctor.specialty}</p>
+                <p className="text-xs text-muted-foreground">{doctor.location}</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </Card>
   );
 };

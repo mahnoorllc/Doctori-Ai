@@ -57,7 +57,7 @@ const Chat = () => {
       return;
     }
     
-    chat.sendMessage(content);
+    chat.sendMessage(`Please ask only one short question at a time. User: ${content}`);
     inputElement.value = '';
   };
 
@@ -230,7 +230,7 @@ const Chat = () => {
                   <div className="flex space-x-2">
                     <Textarea
                       onKeyPress={handleKeyPress}
-                      placeholder="Describe your symptoms in detail... (e.g., 'I have chest pain that started 2 hours ago')"
+                      placeholder="Please share your main concern. I will ask one question at a time."
                       className="flex-1 min-h-[60px] text-sm md:text-base resize-none"
                       disabled={chat.sessionState.isLoading}
                     />

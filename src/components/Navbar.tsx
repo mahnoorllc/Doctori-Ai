@@ -88,6 +88,14 @@ export const Navbar = () => {
           >
             Health Blog
           </Link>
+          <Link 
+            to="/health-tips-bd" 
+            className={`text-foreground hover:text-primary transition-colors ${
+              isActive('/health-tips-bd') ? 'text-primary' : ''
+            }`}
+          >
+            Health Tips (BD)
+          </Link>
           
           {user && (
             <DropdownMenu>
@@ -176,6 +184,13 @@ export const Navbar = () => {
                 onClick={() => setIsOpen(false)}
               >
                 Health Blog
+              </Link>
+              <Link 
+                to="/health-tips-bd" 
+                className="block text-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Health Tips (BD)
               </Link>
               {user && (
                 <>

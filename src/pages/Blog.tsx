@@ -1,62 +1,38 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Clock, ArrowRight, Search, Share2 } from "lucide-react";
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "10 Heart-Healthy Foods to Add to Your Diet",
-    excerpt: "Discover the best foods for cardiovascular health and learn how simple dietary changes can make a big difference.",
-    category: "Nutrition",
-    readTime: "5 min read",
-    date: "2024-01-15",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Understanding Mental Health: Signs and Support",
-    excerpt: "Learn to recognize mental health warning signs and discover available resources for support and treatment.",
-    category: "Mental Health",
-    readTime: "8 min read",
-    date: "2024-01-12",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Women's Health: Essential Screenings by Age",
-    excerpt: "A comprehensive guide to important health screenings and checkups every woman should consider.",
-    category: "Women's Health",
-    readTime: "6 min read",
-    date: "2024-01-10",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=250&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Managing Diabetes: Tips for Better Blood Sugar Control",
-    excerpt: "Practical strategies for managing diabetes and maintaining stable blood sugar levels throughout the day.",
-    category: "Chronic Disease",
-    readTime: "7 min read",
-    date: "2024-01-08",
-    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop",
-  },
-];
+import { blogPosts as data } from "@/data/blogs";
 
 export default function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = ["all", "Nutrition", "Mental Health", "Women's Health", "Chronic Disease"];
+  const categories = useMemo(() => [
+    "all",
+    ...Array.from(new Set(data.map(p => p.category)))
+  ], []);
   
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPosts = data.filter(post => {
+    const s = searchTerm.trim().toLowerCase();
+    const matchesSearch = !s || post.title.toLowerCase().includes(s) || post.excerpt.toLowerCase().includes(s);
     const matchesCategory = selectedCategory === "all" || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // SEO
+  useEffect(() => {
+    document.title = "Health Blog | Doctori AI";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', 'Explore 50+ health articles across nutrition, fitness, symptoms, women\'s & men\'s health, and more.');
+    const linkCanonical = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+    linkCanonical.setAttribute('rel', 'canonical');
+    linkCanonical.setAttribute('href', window.location.href);
+    if (!linkCanonical.parentNode) document.head.appendChild(linkCanonical);
+  }, []);
 
   return (
     <div className="container py-8">
@@ -79,7 +55,7 @@ export default function Blog() {
             />
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full md:w-48">
+            <SelectTrigger className="w-full md:w-56">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -118,6 +94,7 @@ export default function Blog() {
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               
@@ -130,7 +107,7 @@ export default function Blog() {
                   </div>
                 </div>
                 
-                <CardTitle className="text-lg leading-tight hover:text-primary transition-colors">
+                <CardTitle className="text-lg leading-tight">
                   {post.title}
                 </CardTitle>
               </CardHeader>
@@ -171,20 +148,6 @@ export default function Blog() {
           <Button variant="outline" size="lg">
             Load More Articles
           </Button>
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="bg-muted/30 rounded-lg p-8 mt-16 text-center">
-          <h3 className="text-2xl font-bold mb-4">Stay Healthy with Our Newsletter</h3>
-          <p className="text-muted-foreground mb-6">
-            Get weekly health tips, latest articles, and exclusive content from Doctori AI
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <Input placeholder="Enter your email" className="flex-1" />
-            <Button variant="medical">
-              Subscribe
-            </Button>
-          </div>
         </div>
       </div>
     </div>

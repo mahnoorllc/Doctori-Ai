@@ -42,6 +42,7 @@ const App = () => (
             <Route path="doctor/:id" element={<DoctorProfile />} />
             <Route path="medicine" element={<Medicine />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="health-tips-bd" element={<(await import('./pages/HealthTipsBD')).default />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
             <Route path="login" element={<Login />} />
