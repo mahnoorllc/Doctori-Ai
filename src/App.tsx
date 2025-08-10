@@ -24,7 +24,6 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Lazy load HealthTipsBD page for code splitting
 const HealthTipsBD = lazy(() => import('./pages/HealthTipsBD'));
 
 const App = () => (
@@ -44,8 +43,10 @@ const App = () => (
                   <Route path="doctors" element={<Doctors />} />
                   <Route path="doctor/:id" element={<DoctorProfile />} />
                   <Route path="medicine" element={<Medicine />} />
-                  <Route path="blog" element={<Blog />} />
-                  <Route path="health-tips-bd" element={<HealthTipsBD />} />
+                  {/* Nested health-tips-bd inside blog */}
+                  <Route path="blog" element={<Blog />}>
+                    <Route path="health-tips-bd" element={<HealthTipsBD />} />
+                  </Route>
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="login" element={<Login />} />
