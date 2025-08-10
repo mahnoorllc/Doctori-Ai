@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Lazy load HealthTipsBD page for code splitting
+const HealthTipsBD = lazy(() => import('./pages/HealthTipsBD'));
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
@@ -33,29 +35,30 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Index />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="chat-summary" element={<ChatSummary />} />
-            <Route path="doctors" element={<Doctors />} />
-            <Route path="doctor/:id" element={<DoctorProfile />} />
-            <Route path="medicine" element={<Medicine />} />
-            <Route path="blog" element={<Blog />} />
-            <Route path="health-tips-bd" element={<(await import('./pages/HealthTipsBD')).default />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="login" element={<Login />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="doctor-dashboard" element={<DoctorDashboard />} />
-            <Route path="admin" element={<AdminDashboard />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-    </AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Index />} />
+                  <Route path="chat" element={<Chat />} />
+                  <Route path="chat-summary" element={<ChatSummary />} />
+                  <Route path="doctors" element={<Doctors />} />
+                  <Route path="doctor/:id" element={<DoctorProfile />} />
+                  <Route path="medicine" element={<Medicine />} />
+                  <Route path="blog" element={<Blog />} />
+                  <Route path="health-tips-bd" element={<HealthTipsBD />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="doctor-dashboard" element={<DoctorDashboard />} />
+                  <Route path="admin" element={<AdminDashboard />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
