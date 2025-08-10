@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Outlet } from "react-router-dom";  // <-- Import Outlet here
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +87,7 @@ export default function Blog() {
           ))}
         </div>
 
+        {/* Blog posts grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredPosts.map((post) => (
             <Card key={post.id} className="shadow-card hover:shadow-medical transition-all hover:scale-105">
@@ -150,6 +152,9 @@ export default function Blog() {
           </Button>
         </div>
       </div>
+
+      {/* This is where nested routes like health-tips-bd will render */}
+      <Outlet />
     </div>
   );
 }
