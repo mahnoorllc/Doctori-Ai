@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,6 +15,7 @@ import Doctors from "./pages/Doctors";
 import DoctorProfile from "./pages/DoctorProfile";
 import Medicine from "./pages/Medicine";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -43,10 +45,11 @@ const App = () => (
                   <Route path="doctors" element={<Doctors />} />
                   <Route path="doctor/:id" element={<DoctorProfile />} />
                   <Route path="medicine" element={<Medicine />} />
-                  {/* Nested health-tips-bd inside blog */}
+                  {/* Blog routes */}
                   <Route path="blog" element={<Blog />}>
                     <Route path="health-tips-bd" element={<HealthTipsBD />} />
                   </Route>
+                  <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="login" element={<Login />} />

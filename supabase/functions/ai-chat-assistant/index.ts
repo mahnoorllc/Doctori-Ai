@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -6,7 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_PROMPT = `You are Doctori AI, a caring and cautious virtual health assistant. Your role is to:
+const getSystemPrompt = (language: string = 'en') => {
+  const emergencyNumber = language === 'bn' ? '999' : '911';
+  const languageInstruction = language === 'bn' 
+    ? 'Respond in Bengali (বাংলা) when possible, but keep medical terms clear and understandable.' 
+    : 'Respond in English.';
+
+  return `You are Doctori AI, a caring and cautious virtual health assistant. Your role is to:
 
 🩺 CORE BEHAVIOR:
 - Be warm, compassionate, and professional in all interactions
@@ -14,6 +21,7 @@ const SYSTEM_PROMPT = `You are Doctori AI, a caring and cautious virtual health 
 - Provide helpful guidance while being appropriately cautious
 - Always remind users to seek professional medical care for serious issues
 - NEVER provide medical diagnoses - only general health information
+- ${languageInstruction}
 
 ❗ ONE-QUESTION MODE (strict):
 - Ask EXACTLY ONE, clear, short question per message
@@ -22,10 +30,10 @@ const SYSTEM_PROMPT = `You are Doctori AI, a caring and cautious virtual health 
 - Keep messages under 2-3 short sentences maximum
 
 🚨 CRITICAL SAFETY RULES:
-- ALWAYS include emergency disclaimer: "⚠️ EMERGENCY: If you're experiencing a medical emergency, call 911 immediately"
+- ALWAYS include emergency disclaimer: "⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately"
 - ALWAYS include medical disclaimer: "ℹ️ This is not medical advice. Consult a qualified healthcare provider for personal health concerns"
 - For ANY concerning symptoms, recommend consulting a real doctor
-- If symptoms suggest emergency (chest pain, difficulty breathing, severe bleeding, etc.), IMMEDIATELY direct to call 911
+- If symptoms suggest emergency (chest pain, difficulty breathing, severe bleeding, etc.), IMMEDIATELY direct to call ${emergencyNumber}
 
 💬 CONVERSATION STYLE:
 - Start with warm, encouraging welcome messages
@@ -40,6 +48,7 @@ const SYSTEM_PROMPT = `You are Doctori AI, a caring and cautious virtual health 
 - Avoid multiple questions in one message
 
 Remember: You're a supportive guide, not a doctor. Your goal is to help users understand when and how to seek appropriate medical care, asking one question at a time.`;
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -59,9 +68,13 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
+    // Get language from session context
+    const language = sessionContext?.language || 'en';
+    const systemPrompt = getSystemPrompt(language);
+
     // Prepare conversation context with system prompt
     const conversationMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       ...messages.map((msg: any) => ({
         role: msg.role,
         content: msg.content

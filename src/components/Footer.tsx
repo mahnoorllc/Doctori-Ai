@@ -1,12 +1,15 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Heart, Stethoscope, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, MessageCircle } from "lucide-react";
+import { Heart, Stethoscope, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, MessageCircle, Smartphone, Download } from "lucide-react";
+
 export const Footer = () => {
-  return <footer className="bg-muted/30 border-t">
+  return (
+    <footer className="bg-muted/30 border-t">
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
@@ -20,10 +23,12 @@ export const Footer = () => {
             <p className="text-sm text-muted-foreground">
               Your trusted virtual health assistant, available 24/7 to guide you on your wellness journey.
             </p>
-            <Button variant="medical" size="sm" className="w-full">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Start Chat Now
-            </Button>
+            <Link to="/chat">
+              <Button variant="medical" size="sm" className="w-full">
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Start Chat Now
+              </Button>
+            </Link>
           </div>
 
           {/* Quick Links */}
@@ -65,6 +70,27 @@ export const Footer = () => {
                 <span>Available Now Worldwide</span>
               </div>
             </div>
+          </div>
+
+          {/* Download Apps */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Download Our Apps</h3>
+            <p className="text-sm text-muted-foreground">
+              Get Doctori AI on your mobile device
+            </p>
+            <div className="space-y-2">
+              <Button variant="outline" size="sm" className="w-full justify-start">
+                <Download className="h-4 w-4 mr-2" />
+                Google Play Store
+              </Button>
+              <Button variant="outline" size="sm" className="w-full justify-start">
+                <Smartphone className="h-4 w-4 mr-2" />
+                Apple App Store
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Coming soon to mobile platforms
+            </p>
           </div>
 
           {/* Newsletter */}
@@ -125,5 +151,6 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };

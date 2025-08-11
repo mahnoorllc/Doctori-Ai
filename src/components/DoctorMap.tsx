@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -79,4 +80,4 @@ const DoctorMap = ({ doctors, onDoctorSelect }: { doctors: Doctor[], onDoctorSel
   );
 };
 
-export { DoctorMap, type Doctor };
+export default DoctorMap;

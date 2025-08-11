@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { analyzeSymptoms, getMedicalDisclaimer } from '@/lib/medicalKnowledge';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface GuestMessage {
   id: string;
@@ -29,6 +30,7 @@ const GUEST_STORAGE_KEY = 'doctori_guest_session';
 
 export const useGuestChat = () => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   
   const [sessionState, setSessionState] = useState<GuestChatState>({
     sessionId: `guest_${Date.now()}`,
@@ -85,7 +87,7 @@ export const useGuestChat = () => {
     }));
 
     try {
-      // Call our secure AI chat assistant
+      // Call our secure AI chat assistant with language context
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
         body: {
           userMessage: content,
@@ -94,7 +96,8 @@ export const useGuestChat = () => {
             phase: sessionState.phase,
             symptoms: sessionState.symptoms,
             urgencyLevel: sessionState.urgencyLevel,
-            followupAnswers: sessionState.followupAnswers
+            followupAnswers: sessionState.followupAnswers,
+            language: language
           }
         }
       });
@@ -142,12 +145,13 @@ export const useGuestChat = () => {
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // Fallback response
+      // Fallback response with appropriate emergency number
+      const emergencyNumber = language === 'bn' ? '999' : '911';
       const fallbackMessage: GuestMessage = {
         id: (Date.now() + 1).toString(),
         content: `I'm sorry, I'm having trouble processing your request right now.
 
-⚠️ EMERGENCY: If you're experiencing a medical emergency, call 911 immediately.
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
 
 ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
 
@@ -169,7 +173,7 @@ This is not medical advice. Always consult with a qualified healthcare provider 
         variant: "destructive"
       });
     }
-  }, [sessionState, toast]);
+  }, [sessionState, toast, language]);
 
   const initializeChat = useCallback((welcomeMessage: string) => {
     const professionalWelcome = `Hello! I'm Doctor AI, your caring virtual health assistant. 🩺

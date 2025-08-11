@@ -1,5 +1,6 @@
+
 import { useEffect, useMemo, useState } from "react";
-import { Outlet } from "react-router-dom";  // <-- Import Outlet here
+import { Outlet, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,7 @@ export default function Blog() {
   useEffect(() => {
     document.title = "Health Blog | Doctori AI";
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', 'Explore 50+ health articles across nutrition, fitness, symptoms, women\'s & men\'s health, and more.');
+    if (metaDesc) metaDesc.setAttribute('content', 'Explore 60+ health articles across nutrition, fitness, symptoms, women\'s & men\'s health, and more.');
     const linkCanonical = document.querySelector('link[rel="canonical"]') || document.createElement('link');
     linkCanonical.setAttribute('rel', 'canonical');
     linkCanonical.setAttribute('href', window.location.href);
@@ -129,10 +130,12 @@ export default function Blog() {
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <Share2 className="h-3 w-3" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
-                      Read More
-                      <ArrowRight className="h-3 w-3 ml-1" />
-                    </Button>
+                    <Link to={`/blog/${post.slug}`}>
+                      <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
+                        Read More
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
