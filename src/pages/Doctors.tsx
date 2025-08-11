@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DoctorMap, type Doctor } from "@/components/DoctorMap";
+import DoctorMap, { type Doctor } from "@/components/DoctorMap";
 import { MapPin, Star, Clock, Phone, Calendar, Heart, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 

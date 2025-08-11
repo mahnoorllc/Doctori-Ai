@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useChatSession } from "@/hooks/useChatSession";
 import { useGuestChat } from "@/hooks/useGuestChat";
 import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { isHealthRelated, getHealthFilterResponse } from '@/hooks/useHealthTopicFilter';
 
 const Chat = () => {
@@ -20,7 +20,7 @@ const Chat = () => {
   const { t, language, setLanguage } = useLanguage();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [messageInput, setMessageInput] = useState("");
-  const [chatLanguage, setChatLanguage] = useState(language);
+  const [chatLanguage, setChatLanguage] = useState<Language>(language);
 
   // Use guest chat by default, authenticated chat when logged in
   const authenticatedChat = useChatSession();
@@ -89,9 +89,9 @@ const Chat = () => {
 
   const getPlaceholder = () => {
     if (chatLanguage === 'bn') {
-      return "আপনার প্রধান স্বাস্থ্য সমস্যা শেয়ার করুন। আমি একবারে একটি প্রশ্ন জিজ্ঞাসা করব।";
+      return "আপনার স্বাস্থ্য সমস্যা বিস্তারিত বর্ণনা করুন...";
     }
-    return "Share your main health concern. I will ask one question at a time.";
+    return "Describe your health concerns in detail...";
   };
 
   return (
@@ -198,7 +198,7 @@ const Chat = () => {
                   {/* Language Selector */}
                   <div className="flex items-center space-x-2 mb-2">
                     <Globe className="h-4 w-4 text-muted-foreground" />
-                    <Select value={chatLanguage} onValueChange={setChatLanguage}>
+                    <Select value={chatLanguage} onValueChange={(value: string) => setChatLanguage(value as Language)}>
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
