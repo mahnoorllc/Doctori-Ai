@@ -51,14 +51,14 @@ Remember: You're a supportive guide, not a doctor. Your goal is to help users un
 
 // Function to summarize conversation history when it gets too long
 const summarizeConversation = (messages: any[]) => {
-  // Keep only the last 6 messages (3 exchanges) plus system prompt
-  if (messages.length <= 7) return messages;
+  // Keep only the last 4 messages (2 exchanges) plus system prompt for better token management
+  if (messages.length <= 5) return messages;
   
   const systemMessage = messages[0];
-  const recentMessages = messages.slice(-6);
+  const recentMessages = messages.slice(-4);
   
   // Create a summary of the older messages
-  const olderMessages = messages.slice(1, -6);
+  const olderMessages = messages.slice(1, -4);
   const summaryContent = `Previous conversation summary: The user discussed ${olderMessages.length > 0 ? 'various health concerns' : 'initial health questions'}. Recent context continues below.`;
   
   return [
@@ -68,8 +68,8 @@ const summarizeConversation = (messages: any[]) => {
   ];
 };
 
-// Retry function with exponential backoff
-const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 3, baseDelay = 1000) => {
+// Enhanced retry function with better backoff strategy
+const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 3, baseDelay = 2000) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
@@ -81,9 +81,10 @@ const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 3, baseDela
       }
       
       // Check if it's a rate limit error
-      if (error.message && error.message.includes('rate limit')) {
-        const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
-        console.log(`Rate limit hit, waiting ${delay}ms before retry ${attempt + 1}`);
+      if (error.message && (error.message.includes('rate limit') || error.message.includes('Rate limit'))) {
+        // For rate limits, use longer delays
+        const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 2000; // 2-6 seconds range
+        console.log(`Rate limit hit, waiting ${Math.round(delay)}ms before retry ${attempt + 1}`);
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         // For other errors, shorter delay
@@ -130,7 +131,7 @@ serve(async (req) => {
 
     console.log('Sending request to OpenAI with', conversationMessages.length, 'messages');
 
-    // Call OpenAI API with retry logic
+    // Call OpenAI API with retry logic - using newer model with better limits
     const data = await retryWithBackoff(async () => {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -139,9 +140,9 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14', // Using newer model with better rate limits
           messages: conversationMessages,
-          max_tokens: 800, // Reduced to save tokens
+          max_tokens: 500, // Reduced for better token management
           temperature: 0.7,
           presence_penalty: 0.1,
           frequency_penalty: 0.1
@@ -155,7 +156,7 @@ serve(async (req) => {
       }
 
       return await response.json();
-    }, 3, 2000); // 3 retries with 2 second base delay
+    }, 3, 3000); // 3 retries with 3 second base delay
 
     const aiResponse = data.choices[0]?.message?.content;
 
@@ -181,8 +182,16 @@ serve(async (req) => {
     let fallbackResponse;
     const emergencyNumber = '911'; // Default to 911, will be overridden by language context if needed
     
-    if (error.message && error.message.includes('rate limit')) {
+    if (error.message && (error.message.includes('rate limit') || error.message.includes('Rate limit'))) {
       fallbackResponse = `I'm experiencing high demand right now and need a moment to respond. Please try again in a few seconds.
+
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
+
+ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
+
+This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`;
+    } else if (error.message && error.message.includes('API key')) {
+      fallbackResponse = `I'm having trouble connecting to my AI services right now. Please try again in a moment.
 
 ⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
 
@@ -199,12 +208,17 @@ This is not medical advice. Always consult with a qualified healthcare provider 
 This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`;
     }
 
+    const statusCode = error.message?.includes('rate limit') ? 429 : 
+                      error.message?.includes('API key') ? 401 : 500;
+
     return new Response(JSON.stringify({ 
       response: fallbackResponse,
-      error: error.message.includes('rate limit') ? "Rate limit exceeded" : "AI service temporarily unavailable",
-      retryAfter: error.message.includes('rate limit') ? 10 : 5
+      error: error.message.includes('rate limit') ? "Rate limit exceeded" : 
+             error.message.includes('API key') ? "API authentication error" :
+             "AI service temporarily unavailable",
+      retryAfter: error.message.includes('rate limit') ? 15 : 5
     }), {
-      status: error.message.includes('rate limit') ? 429 : 500,
+      status: statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

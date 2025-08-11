@@ -76,6 +76,8 @@ export const useGuestChat = () => {
 
   const sendMessageWithRetry = useCallback(async (content: string, retryCount = 0): Promise<void> => {
     try {
+      console.log(`Sending message to AI (attempt ${retryCount + 1}):`, content.substring(0, 100));
+      
       // Call our secure AI chat assistant with language context
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
         body: {
@@ -91,7 +93,14 @@ export const useGuestChat = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.response) {
+        throw new Error('No response received from AI');
+      }
 
       let aiResponse = data.response;
       let newState = { ...sessionState };
@@ -133,38 +142,60 @@ export const useGuestChat = () => {
       }));
 
       if (data.usage) {
-        console.log('Token usage:', data.usage);
+        console.log('AI Token usage:', data.usage);
       }
+
+      console.log('AI response received successfully');
 
     } catch (error: any) {
       console.error('Error sending message:', error);
       
       // Check if it's a rate limit error and we can retry
-      if ((error.message?.includes('rate limit') || error.message?.includes('Rate limit')) && retryCount < MAX_RETRIES) {
-        console.log(`Rate limit hit, retrying in ${(retryCount + 1) * 3} seconds...`);
+      if ((error.message?.includes('rate limit') || error.message?.includes('Rate limit') || error.status === 429) && retryCount < MAX_RETRIES) {
+        const retryDelay = (retryCount + 1) * 5; // 5, 10 seconds
+        console.log(`Rate limit hit, retrying in ${retryDelay} seconds...`);
         
         toast({
           title: "High Traffic",
-          description: `Server is busy, retrying in ${(retryCount + 1) * 3} seconds...`,
+          description: `Server is busy, retrying in ${retryDelay} seconds...`,
           variant: "default"
         });
 
         // Wait with exponential backoff
         setTimeout(() => {
           sendMessageWithRetry(content, retryCount + 1);
-        }, (retryCount + 1) * 3000);
+        }, retryDelay * 1000);
         
         return;
       }
       
+      // Handle API key errors specifically
+      if (error.status === 401 || error.message?.includes('API key')) {
+        console.error('API Authentication error detected');
+        toast({
+          title: "Service Configuration Error",
+          description: "There's an issue with our AI service configuration. Please try again later.",
+          variant: "destructive"
+        });
+      }
+      
       // Fallback response with appropriate emergency number
       const emergencyNumber = language === 'bn' ? '999' : '911';
-      const isRateLimit = error.message?.includes('rate limit') || error.message?.includes('Rate limit');
+      const isRateLimit = error.message?.includes('rate limit') || error.message?.includes('Rate limit') || error.status === 429;
+      const isAuthError = error.status === 401 || error.message?.includes('API key');
       
       const fallbackMessage: GuestMessage = {
         id: (Date.now() + 1).toString(),
         content: isRateLimit 
           ? `I'm experiencing high demand right now. Please try again in a moment.
+
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
+
+ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
+
+This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`
+          : isAuthError
+          ? `I'm having trouble connecting to my AI services right now. Please try again in a moment.
 
 ⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
 
@@ -190,13 +221,15 @@ This is not medical advice. Always consult with a qualified healthcare provider 
         retryCount: retryCount
       }));
 
-      toast({
-        title: isRateLimit ? "Server Busy" : "Connection Issue",
-        description: isRateLimit 
-          ? "High demand detected. Please try again shortly." 
-          : "Unable to connect to AI assistant. Please try again.",
-        variant: "destructive"
-      });
+      if (!isAuthError) {
+        toast({
+          title: isRateLimit ? "Server Busy" : "Connection Issue",
+          description: isRateLimit 
+            ? "High demand detected. Please try again shortly." 
+            : "Unable to connect to AI assistant. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   }, [sessionState, toast, language]);
 
