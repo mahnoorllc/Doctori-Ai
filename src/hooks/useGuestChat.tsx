@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { analyzeSymptoms, getMedicalDisclaimer } from '@/lib/medicalKnowledge';
 import { useToast } from '@/components/ui/use-toast';
@@ -24,9 +25,11 @@ export interface GuestChatState {
   followupAnswers: Record<string, string>;
   isLoading: boolean;
   requiresAuth: boolean;
+  retryCount: number;
 }
 
 const GUEST_STORAGE_KEY = 'doctori_guest_session';
+const MAX_RETRIES = 2;
 
 export const useGuestChat = () => {
   const { toast } = useToast();
@@ -42,7 +45,8 @@ export const useGuestChat = () => {
     currentQuestionIndex: 0,
     followupAnswers: {},
     isLoading: false,
-    requiresAuth: false
+    requiresAuth: false,
+    retryCount: 0
   });
 
   // Load session from localStorage on init
@@ -70,22 +74,7 @@ export const useGuestChat = () => {
     }
   }, [sessionState]);
 
-  const sendMessage = useCallback(async (content: string) => {
-    setSessionState(prev => ({ ...prev, isLoading: true }));
-
-    // Add user message
-    const userMessage: GuestMessage = {
-      id: Date.now().toString(),
-      content,
-      role: 'user',
-      timestamp: new Date()
-    };
-
-    setSessionState(prev => ({
-      ...prev,
-      messages: [...prev.messages, userMessage]
-    }));
-
+  const sendMessageWithRetry = useCallback(async (content: string, retryCount = 0): Promise<void> => {
     try {
       // Call our secure AI chat assistant with language context
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
@@ -139,17 +128,50 @@ export const useGuestChat = () => {
       setSessionState(prev => ({
         ...newState,
         messages: [...prev.messages, aiMessage],
-        isLoading: false
+        isLoading: false,
+        retryCount: 0 // Reset retry count on success
       }));
 
-    } catch (error) {
+      if (data.usage) {
+        console.log('Token usage:', data.usage);
+      }
+
+    } catch (error: any) {
       console.error('Error sending message:', error);
+      
+      // Check if it's a rate limit error and we can retry
+      if ((error.message?.includes('rate limit') || error.message?.includes('Rate limit')) && retryCount < MAX_RETRIES) {
+        console.log(`Rate limit hit, retrying in ${(retryCount + 1) * 3} seconds...`);
+        
+        toast({
+          title: "High Traffic",
+          description: `Server is busy, retrying in ${(retryCount + 1) * 3} seconds...`,
+          variant: "default"
+        });
+
+        // Wait with exponential backoff
+        setTimeout(() => {
+          sendMessageWithRetry(content, retryCount + 1);
+        }, (retryCount + 1) * 3000);
+        
+        return;
+      }
       
       // Fallback response with appropriate emergency number
       const emergencyNumber = language === 'bn' ? '999' : '911';
+      const isRateLimit = error.message?.includes('rate limit') || error.message?.includes('Rate limit');
+      
       const fallbackMessage: GuestMessage = {
         id: (Date.now() + 1).toString(),
-        content: `I'm sorry, I'm having trouble processing your request right now.
+        content: isRateLimit 
+          ? `I'm experiencing high demand right now. Please try again in a moment.
+
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
+
+ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
+
+This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`
+          : `I'm sorry, I'm having trouble processing your request right now.
 
 ⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
 
@@ -164,23 +186,45 @@ This is not medical advice. Always consult with a qualified healthcare provider 
       setSessionState(prev => ({
         ...prev,
         messages: [...prev.messages, fallbackMessage],
-        isLoading: false
+        isLoading: false,
+        retryCount: retryCount
       }));
 
       toast({
-        title: "Connection Issue",
-        description: "Unable to connect to AI assistant. Please try again.",
+        title: isRateLimit ? "Server Busy" : "Connection Issue",
+        description: isRateLimit 
+          ? "High demand detected. Please try again shortly." 
+          : "Unable to connect to AI assistant. Please try again.",
         variant: "destructive"
       });
     }
   }, [sessionState, toast, language]);
+
+  const sendMessage = useCallback(async (content: string) => {
+    setSessionState(prev => ({ ...prev, isLoading: true }));
+
+    // Add user message
+    const userMessage: GuestMessage = {
+      id: Date.now().toString(),
+      content,
+      role: 'user',
+      timestamp: new Date()
+    };
+
+    setSessionState(prev => ({
+      ...prev,
+      messages: [...prev.messages, userMessage]
+    }));
+
+    await sendMessageWithRetry(content, 0);
+  }, [sendMessageWithRetry]);
 
   const initializeChat = useCallback((welcomeMessage: string) => {
     const professionalWelcome = `Hello! I'm Doctor AI, your caring virtual health assistant. 🩺
 
 I'm here to help you understand your symptoms and guide you toward appropriate medical care. Please feel free to describe your symptoms or health concerns in as much detail as you're comfortable sharing.
 
-⚠️ **IMPORTANT EMERGENCY NOTICE**: If you're experiencing a medical emergency (chest pain, difficulty breathing, severe bleeding, etc.), please call 911 immediately or go to your nearest emergency room.
+⚠️ **IMPORTANT EMERGENCY NOTICE**: If you're experiencing a medical emergency (chest pain, difficulty breathing, severe bleeding, etc.), please call ${language === 'bn' ? '999' : '911'} immediately or go to your nearest emergency room.
 
 ℹ️ **Medical Disclaimer**: I provide general health information only and am not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for personal health concerns.
 
@@ -197,7 +241,7 @@ What brings you here today? I'm listening and ready to help guide you toward the
       ...prev,
       messages: [welcomeMsg]
     }));
-  }, []);
+  }, [language]);
 
   const clearSession = useCallback(() => {
     localStorage.removeItem(GUEST_STORAGE_KEY);
@@ -211,7 +255,8 @@ What brings you here today? I'm listening and ready to help guide you toward the
       currentQuestionIndex: 0,
       followupAnswers: {},
       isLoading: false,
-      requiresAuth: false
+      requiresAuth: false,
+      retryCount: 0
     });
   }, []);
 

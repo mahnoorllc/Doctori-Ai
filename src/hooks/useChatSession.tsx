@@ -1,8 +1,10 @@
+
 import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { analyzeSymptoms, getMedicalDisclaimer, generateDoctorVisitPreparation } from '@/lib/medicalKnowledge';
 import { useToast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface ChatMessage {
   id: string;
@@ -23,11 +25,15 @@ export interface ChatSessionState {
   currentQuestionIndex: number;
   followupAnswers: Record<string, string>;
   isLoading: boolean;
+  retryCount: number;
 }
+
+const MAX_RETRIES = 2;
 
 export const useChatSession = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { language } = useLanguage();
   
   const [sessionState, setSessionState] = useState<ChatSessionState>({
     sessionId: null,
@@ -38,7 +44,8 @@ export const useChatSession = () => {
     specialtyRecommendation: '',
     currentQuestionIndex: 0,
     followupAnswers: {},
-    isLoading: false
+    isLoading: false,
+    retryCount: 0
   });
 
   const createSession = useCallback(async () => {
@@ -86,45 +93,7 @@ export const useChatSession = () => {
     }
   }, [sessionState.sessionId]);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to start a chat session.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setSessionState(prev => ({ ...prev, isLoading: true }));
-
-    // Create session if it doesn't exist
-    let sessionId = sessionState.sessionId;
-    if (!sessionId) {
-      sessionId = await createSession();
-      if (!sessionId) {
-        setSessionState(prev => ({ ...prev, isLoading: false }));
-        return;
-      }
-      setSessionState(prev => ({ ...prev, sessionId }));
-    }
-
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content,
-      role: 'user',
-      timestamp: new Date()
-    };
-
-    setSessionState(prev => ({
-      ...prev,
-      messages: [...prev.messages, userMessage]
-    }));
-
-    // Save user message
-    await saveMessage(content, 'user');
-
+  const sendMessageWithRetry = useCallback(async (content: string, sessionId: string, retryCount = 0): Promise<void> => {
     try {
       // Call our secure AI chat assistant
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
@@ -136,7 +105,8 @@ export const useChatSession = () => {
             symptoms: sessionState.symptoms,
             urgencyLevel: sessionState.urgencyLevel,
             followupAnswers: sessionState.followupAnswers,
-            sessionId: sessionId
+            sessionId: sessionId,
+            language: language
           }
         }
       });
@@ -192,21 +162,55 @@ export const useChatSession = () => {
       setSessionState(prev => ({
         ...newState,
         messages: [...prev.messages, aiMessage],
-        isLoading: false
+        isLoading: false,
+        retryCount: 0 // Reset retry count on success
       }));
 
       // Save AI message
       await saveMessage(aiResponse, 'assistant', { urgencyLevel: newState.urgencyLevel });
 
-    } catch (error) {
+      if (data.usage) {
+        console.log('Token usage:', data.usage);
+      }
+
+    } catch (error: any) {
       console.error('Error sending message:', error);
       
+      // Check if it's a rate limit error and we can retry
+      if ((error.message?.includes('rate limit') || error.message?.includes('Rate limit')) && retryCount < MAX_RETRIES) {
+        console.log(`Rate limit hit, retrying in ${(retryCount + 1) * 3} seconds...`);
+        
+        toast({
+          title: "High Traffic",
+          description: `Server is busy, retrying in ${(retryCount + 1) * 3} seconds...`,
+          variant: "default"
+        });
+
+        // Wait with exponential backoff
+        setTimeout(() => {
+          sendMessageWithRetry(content, sessionId, retryCount + 1);
+        }, (retryCount + 1) * 3000);
+        
+        return;
+      }
+      
       // Fallback response
+      const emergencyNumber = language === 'bn' ? '999' : '911';
+      const isRateLimit = error.message?.includes('rate limit') || error.message?.includes('Rate limit');
+      
       const fallbackMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: `I'm sorry, I'm having trouble processing your request right now.
+        content: isRateLimit 
+          ? `I'm experiencing high demand right now. Please try again in a moment.
 
-⚠️ EMERGENCY: If you're experiencing a medical emergency, call 911 immediately.
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
+
+ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
+
+This is not medical advice. Always consult with a qualified healthcare provider for personal health concerns.`
+          : `I'm sorry, I'm having trouble processing your request right now.
+
+⚠️ EMERGENCY: If you're experiencing a medical emergency, call ${emergencyNumber} immediately.
 
 ℹ️ For non-emergency health concerns, please contact your healthcare provider or visit an urgent care center.
 
@@ -219,16 +223,61 @@ This is not medical advice. Always consult with a qualified healthcare provider 
       setSessionState(prev => ({
         ...prev,
         messages: [...prev.messages, fallbackMessage],
-        isLoading: false
+        isLoading: false,
+        retryCount: retryCount
       }));
 
       toast({
-        title: "Connection Issue",
-        description: "Unable to connect to AI assistant. Please try again.",
+        title: isRateLimit ? "Server Busy" : "Connection Issue",
+        description: isRateLimit 
+          ? "High demand detected. Please try again shortly." 
+          : "Unable to connect to AI assistant. Please try again.",
         variant: "destructive"
       });
     }
-  }, [user, sessionState, createSession, saveMessage, toast]);
+  }, [sessionState, saveMessage, toast, language]);
+
+  const sendMessage = useCallback(async (content: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to start a chat session.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSessionState(prev => ({ ...prev, isLoading: true }));
+
+    // Create session if it doesn't exist
+    let sessionId = sessionState.sessionId;
+    if (!sessionId) {
+      sessionId = await createSession();
+      if (!sessionId) {
+        setSessionState(prev => ({ ...prev, isLoading: false }));
+        return;
+      }
+      setSessionState(prev => ({ ...prev, sessionId }));
+    }
+
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      content,
+      role: 'user',
+      timestamp: new Date()
+    };
+
+    setSessionState(prev => ({
+      ...prev,
+      messages: [...prev.messages, userMessage]
+    }));
+
+    // Save user message
+    await saveMessage(content, 'user');
+
+    await sendMessageWithRetry(content, sessionId, 0);
+  }, [user, sessionState, createSession, saveMessage, sendMessageWithRetry]);
 
   const generateAssessment = useCallback(async (state: ChatSessionState) => {
     if (!state.sessionId) return;
@@ -297,11 +346,12 @@ This is not medical advice. Always consult with a qualified healthcare provider 
   }, [user, toast]);
 
   const initializeChat = useCallback(() => {
+    const emergencyNumber = language === 'bn' ? '999' : '911';
     const professionalWelcome = `Hello! I'm Doctor AI, your caring virtual health assistant. 🩺
 
 Welcome to your personalized health consultation. I'm here to help you understand your symptoms and guide you toward appropriate medical care. Please feel free to describe your symptoms or health concerns in as much detail as you're comfortable sharing.
 
-⚠️ **IMPORTANT EMERGENCY NOTICE**: If you're experiencing a medical emergency (chest pain, difficulty breathing, severe bleeding, etc.), please call 911 immediately or go to your nearest emergency room.
+⚠️ **IMPORTANT EMERGENCY NOTICE**: If you're experiencing a medical emergency (chest pain, difficulty breathing, severe bleeding, etc.), please call ${emergencyNumber} immediately or go to your nearest emergency room.
 
 ℹ️ **Medical Disclaimer**: I provide general health information only and am not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for personal health concerns.
 
@@ -318,7 +368,7 @@ As a registered user, I'll be able to save our conversation and provide you with
       ...prev,
       messages: [welcomeMessage]
     }));
-  }, []);
+  }, [language]);
 
   return {
     sessionState,
