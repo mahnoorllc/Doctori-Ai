@@ -1,42 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  MessageCircle, 
-  Search, 
-  BookOpen, 
-  Heart, 
-  Shield, 
-  Users, 
-  Stethoscope,
-  Brain,
-  Activity,
-  Clock,
-  Star,
-  CheckCircle,
-  Globe,
-  Smartphone,
-  Calendar,
-  FileText,
-  Target,
-  TrendingUp,
-  Award,
-  Lightbulb,
-  ChevronRight,
-  Phone,
-  Mail,
-  MapPin,
-  Languages,
-  ThumbsUp,
-  Eye,
-  Zap
-} from "lucide-react";
+import { MessageCircle, Search, BookOpen, Heart, Shield, Users, Stethoscope, Brain, Activity, Clock, Star, CheckCircle, Globe, Smartphone, Calendar, FileText, Target, TrendingUp, Award, Lightbulb, ChevronRight, Phone, Mail, MapPin, Languages, ThumbsUp, Eye, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-gradient-hero py-20 px-4">
         <div className="container max-w-6xl mx-auto">
@@ -83,11 +52,7 @@ const Index = () => {
             </div>
             
             <div className="relative">
-              <img
-                src={heroImage}
-                alt="Doctori AI Health Assistant"
-                className="rounded-2xl shadow-medical w-full animate-float"
-              />
+              <img src={heroImage} alt="Doctori AI Health Assistant" className="rounded-2xl shadow-medical w-full animate-float" />
             </div>
           </div>
         </div>
@@ -211,18 +176,12 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card className="shadow-card hover:shadow-medical transition-all">
               <CardContent className="p-6 text-center">
-                <img
-                  src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&h=120&fit=crop&crop=face"
-                  alt="Dr. Sarah Johnson"
-                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                />
+                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&h=120&fit=crop&crop=face" alt="Dr. Sarah Johnson" className="w-20 h-20 rounded-full mx-auto mb-4 object-cover" />
                 <h3 className="font-semibold mb-1">Dr. Sarah Johnson</h3>
                 <Badge variant="secondary" className="mb-3">Cardiologist</Badge>
                 <div className="flex items-center justify-center space-x-1 mb-3">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => (
-                      <span key={i} className="text-yellow-400 text-sm">★</span>
-                    ))}
+                    {[1, 2, 3, 4, 5].map(i => <span key={i} className="text-yellow-400 text-sm">★</span>)}
                   </div>
                   <span className="text-sm text-muted-foreground">4.8 (127 reviews)</span>
                 </div>
@@ -237,18 +196,12 @@ const Index = () => {
             
             <Card className="shadow-card hover:shadow-medical transition-all">
               <CardContent className="p-6 text-center">
-                <img
-                  src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=120&h=120&fit=crop&crop=face"
-                  alt="Dr. Michael Chen"
-                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                />
+                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=120&h=120&fit=crop&crop=face" alt="Dr. Michael Chen" className="w-20 h-20 rounded-full mx-auto mb-4 object-cover" />
                 <h3 className="font-semibold mb-1">Dr. Michael Chen</h3>
                 <Badge variant="secondary" className="mb-3">General Practice</Badge>
                 <div className="flex items-center justify-center space-x-1 mb-3">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => (
-                      <span key={i} className="text-yellow-400 text-sm">★</span>
-                    ))}
+                    {[1, 2, 3, 4, 5].map(i => <span key={i} className="text-yellow-400 text-sm">★</span>)}
                   </div>
                   <span className="text-sm text-muted-foreground">4.9 (203 reviews)</span>
                 </div>
@@ -263,18 +216,12 @@ const Index = () => {
             
             <Card className="shadow-card hover:shadow-medical transition-all">
               <CardContent className="p-6 text-center">
-                <img
-                  src="https://images.unsplash.com/photo-1594824797147-5cd0b4cf9e67?w=120&h=120&fit=crop&crop=face"
-                  alt="Dr. Emily Rodriguez"
-                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                />
+                <img src="https://images.unsplash.com/photo-1594824797147-5cd0b4cf9e67?w=120&h=120&fit=crop&crop=face" alt="Dr. Emily Rodriguez" className="w-20 h-20 rounded-full mx-auto mb-4 object-cover" />
                 <h3 className="font-semibold mb-1">Dr. Emily Rodriguez</h3>
                 <Badge variant="secondary" className="mb-3">Pediatrics</Badge>
                 <div className="flex items-center justify-center space-x-1 mb-3">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => (
-                      <span key={i} className="text-yellow-400 text-sm">★</span>
-                    ))}
+                    {[1, 2, 3, 4, 5].map(i => <span key={i} className="text-yellow-400 text-sm">★</span>)}
                   </div>
                   <span className="text-sm text-muted-foreground">4.7 (89 reviews)</span>
                 </div>
@@ -342,13 +289,27 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-4 gap-6 mb-12">
-            {[
-              { icon: Brain, label: "Mental Health", desc: "Stress, anxiety, depression", color: "from-purple-500 to-purple-600" },
-              { icon: Heart, label: "Cardiovascular", desc: "Heart conditions, blood pressure", color: "from-red-500 to-red-600" },
-              { icon: Activity, label: "General Health", desc: "Common symptoms, wellness", color: "from-green-500 to-green-600" },
-              { icon: Eye, label: "Preventive Care", desc: "Health screening, lifestyle", color: "from-blue-500 to-blue-600" }
-            ].map((category, index) => (
-              <Link key={index} to="/chat">
+            {[{
+            icon: Brain,
+            label: "Mental Health",
+            desc: "Stress, anxiety, depression",
+            color: "from-purple-500 to-purple-600"
+          }, {
+            icon: Heart,
+            label: "Cardiovascular",
+            desc: "Heart conditions, blood pressure",
+            color: "from-red-500 to-red-600"
+          }, {
+            icon: Activity,
+            label: "General Health",
+            desc: "Common symptoms, wellness",
+            color: "from-green-500 to-green-600"
+          }, {
+            icon: Eye,
+            label: "Preventive Care",
+            desc: "Health screening, lifestyle",
+            color: "from-blue-500 to-blue-600"
+          }].map((category, index) => <Link key={index} to="/chat">
                 <Card className="shadow-card hover:shadow-medical transition-all hover:scale-105 cursor-pointer">
                   <CardContent className="p-6 text-center">
                     <div className={`bg-gradient-to-br ${category.color} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}>
@@ -358,8 +319,7 @@ const Index = () => {
                     <p className="text-sm text-muted-foreground">{category.desc}</p>
                   </CardContent>
                 </Card>
-              </Link>
-            ))}
+              </Link>)}
           </div>
         </div>
       </section>
@@ -377,27 +337,22 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {[
-              {
-                tip: "Stay hydrated by drinking at least 8 glasses of water daily",
-                category: "Nutrition",
-                icon: Target,
-                color: "bg-blue-500"
-              },
-              {
-                tip: "Practice deep breathing for 5 minutes to reduce stress and anxiety",
-                category: "Mental Health",
-                icon: Brain,
-                color: "bg-purple-500"
-              },
-              {
-                tip: "Take regular breaks from screen time to protect your vision",
-                category: "Wellness",
-                icon: Eye,
-                color: "bg-green-500"
-              }
-            ].map((tip, index) => (
-              <Link key={index} to="/blog">
+            {[{
+            tip: "Stay hydrated by drinking at least 8 glasses of water daily",
+            category: "Nutrition",
+            icon: Target,
+            color: "bg-blue-500"
+          }, {
+            tip: "Practice deep breathing for 5 minutes to reduce stress and anxiety",
+            category: "Mental Health",
+            icon: Brain,
+            color: "bg-purple-500"
+          }, {
+            tip: "Take regular breaks from screen time to protect your vision",
+            category: "Wellness",
+            icon: Eye,
+            color: "bg-green-500"
+          }].map((tip, index) => <Link key={index} to="/blog">
                 <Card className="shadow-card hover:shadow-medical transition-all cursor-pointer">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
@@ -411,8 +366,7 @@ const Index = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
-            ))}
+              </Link>)}
           </div>
           
           <div className="text-center">
@@ -439,39 +393,31 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Languages,
-                title: "Multi-Language Support",
-                description: "Chat in your preferred language including English, Bengali, and more"
-              },
-              {
-                icon: Smartphone,
-                title: "Mobile Optimized",
-                description: "Access Doctori AI on any device, anywhere, anytime"
-              },
-              {
-                icon: Calendar,
-                title: "Symptom Tracking",
-                description: "Track your symptoms over time and share with doctors"
-              },
-              {
-                icon: FileText,
-                title: "Health Reports",
-                description: "Generate detailed health summaries and consultation reports"
-              },
-              {
-                icon: TrendingUp,
-                title: "Progress Monitoring",
-                description: "Monitor your health trends and improvements over time"
-              },
-              {
-                icon: Zap,
-                title: "Instant Analysis",
-                description: "Get immediate insights based on your symptoms and health data"
-              }
-            ].map((feature, index) => (
-              <Card key={index} className="shadow-card hover:shadow-medical transition-all text-center">
+            {[{
+            icon: Languages,
+            title: "Multi-Language Support",
+            description: "Chat in your preferred language including English, Bengali, and more"
+          }, {
+            icon: Smartphone,
+            title: "Mobile Optimized",
+            description: "Access Doctori AI on any device, anywhere, anytime"
+          }, {
+            icon: Calendar,
+            title: "Symptom Tracking",
+            description: "Track your symptoms over time and share with doctors"
+          }, {
+            icon: FileText,
+            title: "Health Reports",
+            description: "Generate detailed health summaries and consultation reports"
+          }, {
+            icon: TrendingUp,
+            title: "Progress Monitoring",
+            description: "Monitor your health trends and improvements over time"
+          }, {
+            icon: Zap,
+            title: "Instant Analysis",
+            description: "Get immediate insights based on your symptoms and health data"
+          }].map((feature, index) => <Card key={index} className="shadow-card hover:shadow-medical transition-all text-center">
                 <CardContent className="p-6">
                   <div className="bg-gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
                     <feature.icon className="h-8 w-8 text-white" />
@@ -479,8 +425,7 @@ const Index = () => {
                   <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -498,51 +443,39 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Sarah Miller",
-                role: "Teacher",
-                content: "Doctori AI helped me understand my symptoms before my doctor's appointment. The AI was so helpful and the doctor I found was excellent!",
-                rating: 5,
-                avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b734?w=60&h=60&fit=crop&crop=face"
-              },
-              {
-                name: "Ahmed Rahman",
-                role: "Software Engineer",
-                content: "Being able to chat in Bengali made all the difference. The AI understood my concerns perfectly and connected me with a local doctor.",
-                rating: 5,
-                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face"
-              },
-              {
-                name: "Maria Garcia",
-                role: "Mother of 2",
-                content: "As a busy mom, having 24/7 access to health guidance is invaluable. Doctori AI has become my trusted health companion.",
-                rating: 5,
-                avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face"
-              }
-            ].map((testimonial, index) => (
-              <Card key={index} className="shadow-card hover:shadow-medical transition-all">
+            {[{
+            name: "Sarah Miller",
+            role: "Teacher",
+            content: "Doctori AI helped me understand my symptoms before my doctor's appointment. The AI was so helpful and the doctor I found was excellent!",
+            rating: 5,
+            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b734?w=60&h=60&fit=crop&crop=face"
+          }, {
+            name: "Ahmed Rahman",
+            role: "Software Engineer",
+            content: "Being able to chat in Bengali made all the difference. The AI understood my concerns perfectly and connected me with a local doctor.",
+            rating: 5,
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face"
+          }, {
+            name: "Maria Garcia",
+            role: "Mother of 2",
+            content: "As a busy mom, having 24/7 access to health guidance is invaluable. Doctori AI has become my trusted health companion.",
+            rating: 5,
+            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face"
+          }].map((testimonial, index) => <Card key={index} className="shadow-card hover:shadow-medical transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
-                    <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4 object-cover"
-                    />
+                    <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4 object-cover" />
                     <div>
                       <h4 className="font-semibold">{testimonial.name}</h4>
                       <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                     </div>
                   </div>
                   <div className="flex mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                    {[...Array(testimonial.rating)].map((_, i) => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
                   </div>
                   <p className="text-muted-foreground leading-relaxed">"{testimonial.content}"</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -573,7 +506,8 @@ const Index = () => {
             </div>
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-card">
               <h3 className="font-semibold mb-2">Bangladesh</h3>
-              <p className="text-2xl font-bold text-red-600">999</p>
+              <p className="text-2xl font-bold text-red-600">Call - 999
+National Health Call Center – 16263</p>
             </div>
           </div>
           
@@ -596,33 +530,25 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                question: "Is Doctori AI free to use?",
-                answer: "Yes! Our AI health assistant is completely free. You can chat without creating an account. Premium features like PDF reports require registration."
-              },
-              {
-                question: "How accurate is the AI diagnosis?",
-                answer: "Doctori AI provides general health guidance, not medical diagnosis. Always consult with qualified healthcare professionals for medical decisions."
-              },
-              {
-                question: "Can I use Doctori AI in my language?",
-                answer: "Yes! We support multiple languages including English, Bengali, and more. Select your preferred language from the dropdown menu."
-              },
-              {
-                question: "Is my health data secure?",
-                answer: "Absolutely. We use medical-grade security and are HIPAA compliant. Your health information is encrypted and protected."
-              },
-              {
-                question: "How do I book an appointment with a doctor?",
-                answer: "After chatting with our AI, you'll be shown nearby verified doctors. Click on any doctor to view their profile and book an appointment."
-              },
-              {
-                question: "Can doctors join Doctori AI platform?",
-                answer: "Yes! Healthcare professionals can register through our 'Join with Us' section. All doctors undergo verification before being listed."
-              }
-            ].map((faq, index) => (
-              <Card key={index} className="shadow-card hover:shadow-medical transition-all">
+            {[{
+            question: "Is Doctori AI free to use?",
+            answer: "Yes! Our AI health assistant is completely free. You can chat without creating an account. Premium features like PDF reports require registration."
+          }, {
+            question: "How accurate is the AI diagnosis?",
+            answer: "Doctori AI provides general health guidance, not medical diagnosis. Always consult with qualified healthcare professionals for medical decisions."
+          }, {
+            question: "Can I use Doctori AI in my language?",
+            answer: "Yes! We support multiple languages including English, Bengali, and more. Select your preferred language from the dropdown menu."
+          }, {
+            question: "Is my health data secure?",
+            answer: "Absolutely. We use medical-grade security and are HIPAA compliant. Your health information is encrypted and protected."
+          }, {
+            question: "How do I book an appointment with a doctor?",
+            answer: "After chatting with our AI, you'll be shown nearby verified doctors. Click on any doctor to view their profile and book an appointment."
+          }, {
+            question: "Can doctors join Doctori AI platform?",
+            answer: "Yes! Healthcare professionals can register through our 'Join with Us' section. All doctors undergo verification before being listed."
+          }].map((faq, index) => <Card key={index} className="shadow-card hover:shadow-medical transition-all">
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
@@ -630,8 +556,7 @@ const Index = () => {
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -683,8 +608,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
