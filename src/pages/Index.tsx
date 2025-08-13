@@ -506,8 +506,8 @@ const Index = () => {
             </div>
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-card">
               <h3 className="font-semibold mb-2">Bangladesh</h3>
-              <p className="text-2xl font-bold text-red-600">Call - 999
-National Health Call Center – 16263</p>
+              <p className="text-2xl font-bold text-red-600">Call - 999 
+Call Center – 16263</p>
             </div>
           </div>
           
