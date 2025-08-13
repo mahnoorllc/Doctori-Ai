@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,23 +5,21 @@ import { Menu, X, LogOut, User, Stethoscope, ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { LanguageSelector } from "@/components/LanguageSelector";
-
 export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const {
+    user,
+    signOut
+  } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
-  
   const isActive = (path: string) => location.pathname === path;
   const isBlogActive = location.pathname.startsWith('/blog');
-
-  return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  return <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
@@ -64,13 +61,12 @@ export const Navbar = () => {
                 <Link to="/blog" className="w-full">All Blogs</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/blog/health-tips-bd" className="w-full">Health Tips (BD)</Link>
+                <Link to="/blog/health-tips-bd" className="w-full">Health Tips</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {user && (
-            <DropdownMenu>
+          {user && <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-1">
                   <span>Dashboard</span>
@@ -88,24 +84,19 @@ export const Navbar = () => {
                   <Link to="/admin">Admin Panel</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            </DropdownMenu>}
         </div>
 
         {/* Language selector and Auth buttons */}
         <div className="hidden md:flex items-center space-x-2">
           <LanguageSelector />
-          {user ? (
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
+          {user ? <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Link to="/login">
+            </Button> : <Link to="/login">
               <Button variant="outline" size="sm">
                 <User className="h-4 w-4" />
               </Button>
-            </Link>
-          )}
+            </Link>}
         </div>
 
         {/* Mobile menu button */}
@@ -114,8 +105,7 @@ export const Navbar = () => {
         </Button>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background border-b md:hidden z-50">
+        {isOpen && <div className="absolute top-16 left-0 right-0 bg-background border-b md:hidden z-50">
             <div className="container py-4 space-y-4">
               <Link to="/" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
                 Home
@@ -141,8 +131,7 @@ export const Navbar = () => {
                 </Link>
               </div>
               
-              {user && (
-                <>
+              {user && <>
                   <Link to="/dashboard" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
                     User Dashboard
                   </Link>
@@ -152,29 +141,22 @@ export const Navbar = () => {
                   <Link to="/admin" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
                     Admin Panel
                   </Link>
-                </>
-              )}
+                </>}
               
               <div className="pt-4 border-t">
                 <LanguageSelector />
                 <div className="mt-3 space-y-2">
-                  {user ? (
-                    <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start">
+                  {user ? <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start">
                       <LogOut className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Link to="/login" className="block">
+                    </Button> : <Link to="/login" className="block">
                       <Button variant="outline" size="sm" className="w-full justify-start">
                         <User className="h-4 w-4" />
                       </Button>
-                    </Link>
-                  )}
+                    </Link>}
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </nav>
-  );
+    </nav>;
 };
