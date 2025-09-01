@@ -7,13 +7,55 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string | null
+          id: number
+          metadata: Json | null
+          target_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string | null
+          id?: number
+          metadata?: Json | null
+          target_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string | null
+          id?: number
+          metadata?: Json | null
+          target_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_logs_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -334,58 +376,157 @@ export type Database = {
         Row: {
           age: number | null
           allergies: string[] | null
+          approval_status: Database["public"]["Enums"]["approval_status"] | null
+          bio: string | null
+          blood_group: Database["public"]["Enums"]["blood_group_type"] | null
           created_at: string | null
           date_of_birth: string | null
           email: string | null
           emergency_contact: string | null
           first_name: string | null
-          gender: string | null
+          gender: Database["public"]["Enums"]["gender_type"] | null
+          health_info: Json | null
+          height: number | null
           id: string
           last_name: string | null
           medical_conditions: string[] | null
           medications: string[] | null
           name: string | null
           phone: string | null
-          role: string | null
+          photo_url: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
+          weight: number | null
         }
         Insert: {
           age?: number | null
           allergies?: string[] | null
+          approval_status?:
+            | Database["public"]["Enums"]["approval_status"]
+            | null
+          bio?: string | null
+          blood_group?: Database["public"]["Enums"]["blood_group_type"] | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           emergency_contact?: string | null
           first_name?: string | null
-          gender?: string | null
+          gender?: Database["public"]["Enums"]["gender_type"] | null
+          health_info?: Json | null
+          height?: number | null
           id: string
           last_name?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
           name?: string | null
           phone?: string | null
-          role?: string | null
+          photo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
+          weight?: number | null
         }
         Update: {
           age?: number | null
           allergies?: string[] | null
+          approval_status?:
+            | Database["public"]["Enums"]["approval_status"]
+            | null
+          bio?: string | null
+          blood_group?: Database["public"]["Enums"]["blood_group_type"] | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           emergency_contact?: string | null
           first_name?: string | null
-          gender?: string | null
+          gender?: Database["public"]["Enums"]["gender_type"] | null
+          health_info?: Json | null
+          height?: number | null
           id?: string
           last_name?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
           name?: string | null
           phone?: string | null
-          role?: string | null
+          photo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
+          weight?: number | null
         }
         Relationships: []
+      }
+      provider_patient_assignments: {
+        Row: {
+          created_at: string | null
+          id: number
+          patient_id: string
+          provider_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          patient_id: string
+          provider_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          patient_id?: string
+          provider_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_patient_assignments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_patient_assignments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reminders: {
+        Row: {
+          created_at: string | null
+          id: number
+          notes: string | null
+          reminder_time: string
+          repeat_interval: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          reminder_time: string
+          repeat_interval?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          reminder_time?: string
+          repeat_interval?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       visit_preparations: {
         Row: {
@@ -437,9 +578,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_user_approval_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["approval_status"]
+      }
+      get_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      approval_status: "pending" | "approved" | "rejected"
+      blood_group_type: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
+      gender_type: "male" | "female" | "other"
+      user_role: "user" | "provider" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -566,6 +718,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      approval_status: ["pending", "approved", "rejected"],
+      blood_group_type: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      gender_type: ["male", "female", "other"],
+      user_role: ["user", "provider", "admin"],
+    },
   },
 } as const
