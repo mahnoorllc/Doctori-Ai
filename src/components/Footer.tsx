@@ -1,13 +1,10 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Heart, Stethoscope, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, MessageCircle, Smartphone, Download } from "lucide-react";
-
 export const Footer = () => {
-  return (
-    <footer className="bg-muted/30 border-t">
+  return <footer className="bg-muted/30 border-t">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand Section */}
@@ -112,9 +109,7 @@ export const Footer = () => {
 
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-sm text-muted-foreground">
-            © 2025 Doctori AI. Powered by care, guided by AI.
-          </div>
+          <div className="text-sm text-muted-foreground">© 2025 Doctori AI, Mahnoor LLC. Powered by care, guided by AI.</div>
           
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">Follow us:</span>
@@ -151,6 +146,5 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
