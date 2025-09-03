@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,22 @@ const roleConfig = {
 };
 
 export default function Register() {
-  const { role = 'user' } = useParams<{ role: UserRole }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { signUp } = useAuth();
+  
+  // Determine role from URL path
+  const getCurrentRole = (): UserRole => {
+    if (location.pathname.includes('/register/provider')) return 'provider';
+    if (location.pathname.includes('/register/admin')) return 'admin';
+    return 'user';
+  };
+  
+  const currentRole = getCurrentRole();
+  const config = roleConfig[currentRole];
+  const IconComponent = config.icon;
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -41,12 +56,6 @@ export default function Register() {
     lastName: ''
   });
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const config = roleConfig[role as UserRole] || roleConfig.user;
-  const IconComponent = config.icon;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -84,7 +93,7 @@ export default function Register() {
         formData.password, 
         formData.firstName, 
         formData.lastName,
-        role as UserRole
+        currentRole
       );
 
       if (error) {
@@ -106,7 +115,7 @@ export default function Register() {
           title: "Registration successful!",
           description: "Please check your email to verify your account.",
         });
-        navigate('/auth/login');
+        navigate('/login');
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -206,15 +215,15 @@ export default function Register() {
 
           <div className="mt-6 text-center text-sm">
             Already have an account?{' '}
-            <Link to="/auth/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </div>
 
-          {role === 'user' && (
+          {currentRole === 'user' && (
             <div className="mt-4 text-center">
               <Link 
-                to="/auth/register/provider" 
+                to="/register/provider" 
                 className="text-sm text-muted-foreground hover:text-primary"
               >
                 Are you a healthcare provider? Register here

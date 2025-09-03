@@ -1,18 +1,35 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, Stethoscope, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, User, Stethoscope, ChevronDown, UserPlus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleBasedAuth } from "@/hooks/useRoleBasedAuth";
 import { LanguageSelector } from "@/components/LanguageSelector";
 export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user, signOut } = useAuth();
+  const { profile } = useRoleBasedAuth();
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Helper function to get dashboard path based on user role
+  const getDashboardPath = () => {
+    if (!profile) return '/login';
+    
+    switch (profile.role) {
+      case 'user':
+        return '/dashboard/user';
+      case 'provider':
+        return profile.approval_status === 'approved' 
+          ? '/dashboard/provider' 
+          : '/dashboard/provider/pending';
+      case 'admin':
+        return '/dashboard/admin';
+      default:
+        return '/login';
+    }
+  };
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
@@ -48,6 +65,16 @@ export const Navbar = () => {
             Search Medicine
           </Link>
           
+          {/* Become a Provider link for non-users */}
+          {!user && (
+            <Link to="/register/provider" className={`text-foreground hover:text-primary transition-colors ${isActive('/register/provider') ? 'text-primary' : ''}`}>
+              <div className="flex items-center space-x-1">
+                <UserPlus className="h-4 w-4" />
+                <span>Become a Provider</span>
+              </div>
+            </Link>
+          )}
+          
           {/* Health Blog Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -66,25 +93,12 @@ export const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {user && <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-1">
-                  <span>Dashboard</span>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-background border z-50">
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard">User Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/doctor-dashboard">Doctor Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/admin">Admin Panel</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>}
+          {/* Dashboard link for authenticated users */}
+          {user && profile && (
+            <Link to={getDashboardPath()} className={`text-foreground hover:text-primary transition-colors ${location.pathname.startsWith('/dashboard') ? 'text-primary' : ''}`}>
+              Dashboard
+            </Link>
+          )}
         </div>
 
         {/* Language selector and Auth buttons */}
@@ -120,6 +134,16 @@ export const Navbar = () => {
                 Search Medicine
               </Link>
               
+              {/* Become a Provider link for mobile */}
+              {!user && (
+                <Link to="/register/provider" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
+                  <div className="flex items-center space-x-2">
+                    <UserPlus className="h-4 w-4" />
+                    <span>Become a Provider</span>
+                  </div>
+                </Link>
+              )}
+              
               {/* Mobile Health Blog Section */}
               <div className="py-2">
                 <p className="text-foreground font-medium mb-2">Health Blog</p>
@@ -131,17 +155,13 @@ export const Navbar = () => {
                 </Link>
               </div>
               
-              {user && <>
-                  <Link to="/dashboard" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
-                    User Dashboard
-                  </Link>
-                  <Link to="/doctor-dashboard" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
-                    Doctor Dashboard
-                  </Link>
-                  <Link to="/admin" className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
-                    Admin Panel
-                  </Link>
-                </>}
+              
+              {/* Dashboard link for mobile */}
+              {user && profile && (
+                <Link to={getDashboardPath()} className="block text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>
+                  Dashboard
+                </Link>
+              )}
               
               <div className="pt-4 border-t">
                 <LanguageSelector />

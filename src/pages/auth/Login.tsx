@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRoleBasedAuth } from '@/hooks/useRoleBasedAuth';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn, UserPlus, Stethoscope, Shield } from 'lucide-react';
 
 export default function Login() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -19,8 +21,10 @@ export default function Login() {
   const [activeTab, setActiveTab] = useState('user');
   const { signIn, user } = useAuth();
   const { profile, redirectToDashboard } = useRoleBasedAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Determine if this is admin login from URL
+  const isAdminLogin = location.pathname.includes('/login/admin');
 
   useEffect(() => {
     if (user && profile) {

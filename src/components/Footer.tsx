@@ -127,6 +127,13 @@ export const Footer = () => {
                 <Linkedin className="h-4 w-4" />
               </Button>
             </div>
+            {/* Staff Access Link */}
+            <Link 
+              to="/login/admin" 
+              className="text-muted-foreground hover:text-primary transition-colors text-xs"
+            >
+              Staff Access
+            </Link>
           </div>
         </div>
 

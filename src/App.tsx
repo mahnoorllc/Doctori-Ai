@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { Layout } from "./components/Layout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
 import ChatSummary from "./pages/ChatSummary";
@@ -18,10 +19,12 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import DoctorDashboard from "./pages/DoctorDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import Register from "./pages/auth/Register";
+import Login from "./pages/auth/Login";
+import UserDashboard from "./pages/dashboard/UserDashboard";
+import ProviderDashboard from "./pages/dashboard/ProviderDashboard";
+import ProviderPendingPage from "./pages/dashboard/ProviderPendingPage";
+import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,10 +55,46 @@ const App = () => (
                   <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
+                  
+                  {/* Authentication Routes */}
+                  <Route path="register/user" element={<Register />} />
+                  <Route path="register/provider" element={<Register />} />
                   <Route path="login" element={<Login />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="doctor-dashboard" element={<DoctorDashboard />} />
-                  <Route path="admin" element={<AdminDashboard />} />
+                  <Route path="login/admin" element={<Login />} />
+                  
+                  {/* Protected Dashboard Routes */}
+                  <Route 
+                    path="dashboard/user" 
+                    element={
+                      <ProtectedRoute requiredRole="user">
+                        <UserDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="dashboard/provider" 
+                    element={
+                      <ProtectedRoute requiredRole="provider" requireApproval={true}>
+                        <ProviderDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="dashboard/provider/pending" 
+                    element={
+                      <ProtectedRoute requiredRole="provider">
+                        <ProviderPendingPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="dashboard/admin" 
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
