@@ -95,10 +95,11 @@ export const useGuestChat = () => {
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw error;
+        throw new Error(error.message || 'Failed to connect to AI service');
       }
 
       if (!data?.response) {
+        console.error('Invalid response from AI service:', data);
         throw new Error('No response received from AI');
       }
 

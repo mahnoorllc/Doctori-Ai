@@ -4,6 +4,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Max-Age': '86400',
 };
 
 const getSystemPrompt = (language: string = 'en') => {
@@ -109,8 +111,11 @@ serve(async (req) => {
 
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
+      console.error('OpenAI API key not found in environment variables');
       throw new Error('OpenAI API key not configured');
     }
+
+    console.log('Processing chat request with message length:', userMessage.length);
 
     // Get language from session context
     const language = sessionContext?.language || 'en';
@@ -129,9 +134,9 @@ serve(async (req) => {
     // Summarize conversation if it's getting too long
     conversationMessages = summarizeConversation(conversationMessages);
 
-    console.log('Sending request to OpenAI with', conversationMessages.length, 'messages');
+    console.log('Sending request to OpenAI with', conversationMessages.length, 'messages using gpt-4o-mini model');
 
-    // Call OpenAI API with retry logic - using newer model with better limits
+    // Call OpenAI API with retry logic - using gpt-4o-mini as requested
     const data = await retryWithBackoff(async () => {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -140,18 +145,39 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14', // Using newer model with better rate limits
+          model: 'gpt-4o-mini', // Using gpt-4o-mini as requested
           messages: conversationMessages,
-          max_tokens: 500, // Reduced for better token management
-          temperature: 0.7,
+          max_tokens: 500, // Using max_tokens for gpt-4o-mini (legacy model)
+          temperature: 0.7, // gpt-4o-mini supports temperature
           presence_penalty: 0.1,
           frequency_penalty: 0.1
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('OpenAI API error:', errorData);
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: { message: errorText } };
+        }
+        
+        console.error('OpenAI API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        
+        // Handle specific error types
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded');
+        } else if (response.status === 401) {
+          throw new Error('Invalid API key or insufficient quota');
+        } else if (response.status === 400) {
+          throw new Error(`Invalid request: ${errorData.error?.message || 'Bad request'}`);
+        }
+        
         throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
       }
 

@@ -111,7 +111,15 @@ export const useChatSession = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to connect to AI service');
+      }
+
+      if (!data?.response) {
+        console.error('Invalid response from AI service:', data);
+        throw new Error('No response received from AI');
+      }
 
       let aiResponse = data.response;
       let newState = { ...sessionState };
