@@ -1,18 +1,14 @@
-// src/contexts/LanguageContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-// Define supported languages
 export type Language = 'en' | 'bn' | 'es' | 'fr' | 'ar';
 
-// Context type
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 }
 
-// Translations
-const translations: Record<Language, Record<string, string>> = {
+const translations = {
   en: {
     'chat.title': 'Chat with Doctori AI',
     'chat.subtitle': 'Your personal AI health assistant - Always here to help',
@@ -95,15 +91,13 @@ const translations: Record<Language, Record<string, string>> = {
   }
 };
 
-// Create context
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Provider
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    return translations[language][key as keyof typeof translations[Language]] || key;
   };
 
   return (
@@ -113,9 +107,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook to use in components
-export const useLanguage = (): LanguageContextType => {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
   return context;
 };
