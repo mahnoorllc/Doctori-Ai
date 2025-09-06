@@ -177,9 +177,7 @@ export const useChatSession = () => {
       // Save AI message
       await saveMessage(aiResponse, 'assistant', { urgencyLevel: newState.urgencyLevel });
 
-      if (data.usage) {
-        console.log('Token usage:', data.usage);
-      }
+      // Removed detailed logging for privacy
 
     } catch (error: any) {
       console.error('Error sending message:', error);

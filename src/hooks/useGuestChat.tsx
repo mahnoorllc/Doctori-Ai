@@ -67,16 +67,40 @@ export const useGuestChat = () => {
     }
   }, []);
 
-  // Save session to localStorage whenever it changes
+  // Save session to localStorage whenever it changes (with privacy protection)
   useEffect(() => {
     if (sessionState.messages.length > 0) {
-      localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(sessionState));
+      // Only save essential data, exclude sensitive content in production
+      const sanitizedSession = {
+        ...sessionState,
+        messages: sessionState.messages.map(msg => ({
+          ...msg,
+          content: msg.role === 'user' ? '[User message]' : msg.content.substring(0, 200) + '...'
+        }))
+      };
+      localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(sanitizedSession));
+      
+      // Auto-clear old sessions (24 hour retention)
+      setTimeout(() => {
+        const saved = localStorage.getItem(GUEST_STORAGE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            const lastActivity = new Date(Math.max(...parsed.messages.map((m: any) => new Date(m.timestamp).getTime())));
+            if (Date.now() - lastActivity.getTime() > 24 * 60 * 60 * 1000) {
+              localStorage.removeItem(GUEST_STORAGE_KEY);
+            }
+          } catch (e) {
+            localStorage.removeItem(GUEST_STORAGE_KEY);
+          }
+        }
+      }, 1000);
     }
   }, [sessionState]);
 
   const sendMessageWithRetry = useCallback(async (content: string, retryCount = 0): Promise<void> => {
     try {
-      console.log(`Sending message to AI (attempt ${retryCount + 1}):`, content.substring(0, 100));
+      console.log(`Sending message to AI (attempt ${retryCount + 1})`);
       
       // Call our secure AI chat assistant with language context
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
@@ -142,11 +166,7 @@ export const useGuestChat = () => {
         retryCount: 0 // Reset retry count on success
       }));
 
-      if (data.usage) {
-        console.log('AI Token usage:', data.usage);
-      }
-
-      console.log('AI response received successfully');
+      // Removed detailed logging for privacy
 
     } catch (error: any) {
       console.error('Error sending message:', error);

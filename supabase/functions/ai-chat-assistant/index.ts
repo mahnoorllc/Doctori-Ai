@@ -1,11 +1,29 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Max-Age': '86400',
+// Initialize Supabase client for database operations
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Allowed origins for CORS (replace with your actual domains)
+const allowedOrigins = [
+  'https://lhamshhjmmruybdcfivr.supabase.co',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://preview.lovable.app',
+  'https://lovable.app'
+];
+
+const getCorsHeaders = (origin: string | null) => {
+  const isAllowed = origin && allowedOrigins.includes(origin);
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Max-Age': '86400',
+  };
 };
 
 const getSystemPrompt = (language: string = 'en') => {
@@ -105,13 +123,73 @@ const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 3, baseDela
 };
 
 serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Security: Validate origin for non-OPTIONS requests
+  if (origin && !allowedOrigins.includes(origin)) {
+    console.log('Blocked request from unauthorized origin:', origin);
+    return new Response('Unauthorized', { status: 403 });
+  }
+
   try {
+    // Rate limiting
+    const clientIP = req.headers.get('cf-connecting-ip') || 
+                     req.headers.get('x-forwarded-for') || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    const { data: rateLimitCheck, error: rateLimitError } = await supabase
+      .rpc('check_rate_limit', {
+        _ip_address: clientIP,
+        _endpoint: 'ai-chat-assistant',
+        _max_requests: 15, // 15 requests per 15 minutes
+        _window_minutes: 15
+      });
+
+    if (rateLimitError || !rateLimitCheck) {
+      console.log('Rate limit exceeded for IP:', clientIP);
+      return new Response(JSON.stringify({ 
+        error: 'Rate limit exceeded',
+        retryAfter: 900 // 15 minutes
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const { messages, userMessage, sessionContext } = await req.json();
+    
+    // Input validation
+    if (!userMessage || typeof userMessage !== 'string') {
+      throw new Error('Invalid message content');
+    }
+    
+    if (userMessage.length > 2000) {
+      throw new Error('Message too long (max 2000 characters)');
+    }
+    
+    if (messages && messages.length > 50) {
+      throw new Error('Too many messages in conversation');
+    }
+
+    // Log activity safely
+    if (sessionContext?.sessionId) {
+      await supabase.rpc('log_activity_safe', {
+        _action: 'ai_chat_request',
+        _metadata: {
+          session_id: sessionContext.sessionId,
+          message_length: userMessage.length,
+          ip: clientIP,
+          user_agent: req.headers.get('user-agent')?.substring(0, 200) || 'unknown'
+        }
+      });
+    }
     
     if (!userMessage) {
       throw new Error('Message content is required');
