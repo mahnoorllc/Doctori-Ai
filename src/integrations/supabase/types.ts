@@ -490,6 +490,33 @@ export type Database = {
           },
         ]
       }
+      rate_limiter: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: unknown
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       reminders: {
         Row: {
           created_at: string | null
@@ -571,9 +598,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      doctors_public: {
+        Row: {
+          bio: string | null
+          consultation_fee: number | null
+          created_at: string | null
+          experience: number | null
+          id: string | null
+          photo_url: string | null
+          specialty: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          bio?: string | null
+          consultation_fee?: number | null
+          created_at?: string | null
+          experience?: number | null
+          id?: string | null
+          photo_url?: string | null
+          specialty?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          bio?: string | null
+          consultation_fee?: number | null
+          created_at?: string | null
+          experience?: number | null
+          id?: string | null
+          photo_url?: string | null
+          specialty?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          _endpoint: string
+          _ip_address: unknown
+          _max_requests?: number
+          _window_minutes?: number
+        }
+        Returns: boolean
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -585,6 +653,10 @@ export type Database = {
       get_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      log_activity_safe: {
+        Args: { _action: string; _metadata?: Json }
+        Returns: undefined
       }
     }
     Enums: {
