@@ -1,3 +1,14 @@
+import { LanguageProvider } from './contexts/LanguageContext';
+
+<LanguageProvider>
+  <AuthProvider>
+    <TooltipProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </TooltipProvider>
+  </AuthProvider>
+</LanguageProvider>
 
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
