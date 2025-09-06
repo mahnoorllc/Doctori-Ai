@@ -17,16 +17,23 @@ const languages = [
 ];
 
 export const LanguageSelector = () => {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const currentLanguage = languages.find(lang => lang.code === language);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          aria-label="Select Language"
+        >
           <Globe className="h-4 w-4" />
+          {currentLanguage?.flag} {currentLanguage?.name}
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="end">
         {languages.map((lang) => (
           <DropdownMenuItem
