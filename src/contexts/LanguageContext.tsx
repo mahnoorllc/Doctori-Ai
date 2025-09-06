@@ -1,23 +1,19 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/LanguageContext.tsx
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+// Define supported languages
 export type Language = 'en' | 'bn' | 'es' | 'fr' | 'ar';
 
+// Context type
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 }
 
-const translations = {
+// Translations
+const translations: Record<Language, Record<string, string>> = {
   en: {
-    home: 'Home',
-    findDoctors: 'Find Doctors',
-    searchMedicine: 'Search Medicine',
-    becomeProvider: 'Become a Provider',
-    healthBlog: 'Health Blog',
-    allBlogs: 'All Blogs',
-    healthTips: 'Health Tips',
-    dashboard: 'Dashboard',
     'chat.title': 'Chat with Doctori AI',
     'chat.subtitle': 'Your personal AI health assistant - Always here to help',
     'chat.placeholder': 'Describe your symptoms in detail...',
@@ -34,14 +30,6 @@ const translations = {
     'language.select': 'Select Language'
   },
   bn: {
-    home: 'হোম',
-    findDoctors: 'ডাক্তার খুঁজুন',
-    searchMedicine: 'ওষুধ অনুসন্ধান',
-    becomeProvider: 'প্রোভাইডার হোন',
-    healthBlog: 'স্বাস্থ্য ব্লগ',
-    allBlogs: 'সমস্ত ব্লগ',
-    healthTips: 'স্বাস্থ্য টিপস',
-    dashboard: 'ড্যাশবোর্ড',
     'chat.title': 'ডক্টরি এআই এর সাথে চ্যাট করুন',
     'chat.subtitle': 'আপনার ব্যক্তিগত এআই স্বাস্থ্য সহায়ক - সর্বদা সাহায্য করতে এখানে',
     'chat.placeholder': 'আপনার উপসর্গগুলি বিস্তারিত বর্ণনা করুন...',
@@ -58,14 +46,6 @@ const translations = {
     'language.select': 'ভাষা নির্বাচন করুন'
   },
   es: {
-    home: 'Inicio',
-    findDoctors: 'Encontrar Doctores',
-    searchMedicine: 'Buscar Medicina',
-    becomeProvider: 'Convertirse en Proveedor',
-    healthBlog: 'Blog de Salud',
-    allBlogs: 'Todos los Blogs',
-    healthTips: 'Consejos de Salud',
-    dashboard: 'Panel',
     'chat.title': 'Chatea con Doctori AI',
     'chat.subtitle': 'Tu asistente personal de salud con IA - Siempre aquí para ayudar',
     'chat.placeholder': 'Describe tus síntomas en detalle...',
@@ -82,14 +62,6 @@ const translations = {
     'language.select': 'Seleccionar Idioma'
   },
   fr: {
-    home: 'Accueil',
-    findDoctors: 'Trouver des médecins',
-    searchMedicine: 'Rechercher un médicament',
-    becomeProvider: 'Devenir Fournisseur',
-    healthBlog: 'Blog Santé',
-    allBlogs: 'Tous les Blogs',
-    healthTips: 'Conseils Santé',
-    dashboard: 'Tableau de bord',
     'chat.title': 'Chattez avec Doctori AI',
     'chat.subtitle': 'Votre assistant santé IA personnel - Toujours là pour vous aider',
     'chat.placeholder': 'Décrivez vos symptômes en détail...',
@@ -106,14 +78,6 @@ const translations = {
     'language.select': 'Sélectionner la langue'
   },
   ar: {
-    home: 'الرئيسية',
-    findDoctors: 'ابحث عن الأطباء',
-    searchMedicine: 'البحث عن دواء',
-    becomeProvider: 'كن مقدم خدمة',
-    healthBlog: 'مدونة الصحة',
-    allBlogs: 'جميع المدونات',
-    healthTips: 'نصائح صحية',
-    dashboard: 'لوحة التحكم',
     'chat.title': 'تحدث مع دكتوري الذكي',
     'chat.subtitle': 'مساعدك الصحي الشخصي بالذكاء الاصطناعي - موجود دائماً للمساعدة',
     'chat.placeholder': 'صف أعراضك بالتفصيل...',
@@ -131,10 +95,27 @@ const translations = {
   }
 };
 
+// Create context
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Provider
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    return translations[language][
+    return translations[language][key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+// Hook to use in components
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
+  return context;
+};
