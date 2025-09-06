@@ -102,7 +102,21 @@ export const useGuestChat = () => {
     try {
       console.log(`Sending message to AI (attempt ${retryCount + 1})`);
       
-      // Call our secure AI chat assistant with language context
+      // Get user profile data for registered users
+      const { data: userProfile } = await supabase.auth.getUser();
+      const isRegisteredUser = !!userProfile.user;
+      
+      let profileData = null;
+      if (isRegisteredUser) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('age, gender, name, medical_conditions, medications, allergies')
+          .eq('id', userProfile.user.id)
+          .single();
+        profileData = profile;
+      }
+
+      // Call our secure AI chat assistant with language context and user profile
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
         body: {
           userMessage: content,
@@ -112,7 +126,9 @@ export const useGuestChat = () => {
             symptoms: sessionState.symptoms,
             urgencyLevel: sessionState.urgencyLevel,
             followupAnswers: sessionState.followupAnswers,
-            language: language
+            language: language,
+            isRegisteredUser,
+            userProfile: profileData
           }
         }
       });

@@ -30,6 +30,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const HealthTipsBD = lazy(() => import('./pages/HealthTipsBD'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -55,6 +56,7 @@ const App = () => (
                   <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
+                  <Route path="profile" element={<UserProfile />} />
                   
                   {/* Authentication Routes */}
                   <Route path="register/user" element={<Register />} />

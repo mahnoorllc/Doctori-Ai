@@ -178,6 +178,23 @@ serve(async (req) => {
       throw new Error('Too many messages in conversation');
     }
 
+    // Enhanced user context for better AI responses
+    const isRegisteredUser = sessionContext?.isRegisteredUser || false;
+    const userProfile = sessionContext?.userProfile;
+    
+    let userContextInfo = '';
+    if (isRegisteredUser && userProfile) {
+      userContextInfo = `\n\nUSER CONTEXT (DO NOT ask for this information):
+- Name: ${userProfile.name || 'Not provided'}
+- Age: ${userProfile.age || 'Not provided'} 
+- Gender: ${userProfile.gender || 'Not provided'}
+- Medical Conditions: ${userProfile.medical_conditions?.join(', ') || 'None reported'}
+- Current Medications: ${userProfile.medications?.join(', ') || 'None reported'}
+- Allergies: ${userProfile.allergies?.join(', ') || 'None reported'}
+
+Since this user is registered, you already have their basic information. DO NOT ask for age or gender again.`;
+    }
+
     // Log activity safely
     if (sessionContext?.sessionId) {
       await supabase.rpc('log_activity_safe', {
@@ -205,7 +222,7 @@ serve(async (req) => {
 
     // Get language from session context
     const language = sessionContext?.language || 'en';
-    const systemPrompt = getSystemPrompt(language);
+    const systemPrompt = getSystemPrompt(language) + userContextInfo;
 
     // Prepare conversation context with system prompt
     let conversationMessages = [

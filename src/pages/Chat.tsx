@@ -13,6 +13,8 @@ import { useGuestChat } from "@/hooks/useGuestChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { isHealthRelated, getHealthFilterResponse } from '@/hooks/useHealthTopicFilter';
+import { VoiceChatInterface } from "@/components/VoiceChatInterface";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const Chat = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [messageInput, setMessageInput] = useState("");
   const [chatLanguage, setChatLanguage] = useState<Language>(language);
+  const { speak } = useTextToSpeech();
 
   // Use guest chat by default, authenticated chat when logged in
   const authenticatedChat = useChatSession();
@@ -59,6 +62,21 @@ const Chat = () => {
     // Send message with language context
     chat.sendMessage(content);
     setMessageInput('');
+  };
+
+  const handleVoiceMessage = (message: string) => {
+    if (message.trim()) {
+      setMessageInput(message);
+      // Auto-send voice messages
+      setTimeout(() => {
+        handleSendMessage();
+      }, 500);
+    }
+  };
+
+  const handleSpeakText = async (text: string) => {
+    await speak(text, { voice: 'alloy' });
+  };
   };
 
   const handleViewSummary = () => {
@@ -178,6 +196,15 @@ const Chat = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Voice Chat Interface for Premium Users */}
+                  {isAuthenticated && (
+                    <VoiceChatInterface 
+                      onVoiceMessage={handleVoiceMessage}
+                      onSpeakText={handleSpeakText}
+                      disabled={chat.sessionState.isLoading}
+                    />
+                  )}
+                  
                   {/* Emergency Alert - Always Visible */}
                   {(chat.sessionState.urgencyLevel === "high" || chat.sessionState.urgencyLevel === "emergency") && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">

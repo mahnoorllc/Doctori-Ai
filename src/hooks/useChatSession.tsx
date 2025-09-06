@@ -95,6 +95,17 @@ export const useChatSession = () => {
 
   const sendMessageWithRetry = useCallback(async (content: string, sessionId: string, retryCount = 0): Promise<void> => {
     try {
+      // Get user profile data
+      let userProfile = null;
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('age, gender, name, medical_conditions, medications, allergies')
+          .eq('id', user.id)
+          .single();
+        userProfile = profile;
+      }
+
       // Call our secure AI chat assistant
       const { data, error } = await supabase.functions.invoke('ai-chat-assistant', {
         body: {
@@ -106,7 +117,9 @@ export const useChatSession = () => {
             urgencyLevel: sessionState.urgencyLevel,
             followupAnswers: sessionState.followupAnswers,
             sessionId: sessionId,
-            language: language
+            language: language,
+            isRegisteredUser: true,
+            userProfile: userProfile
           }
         }
       });

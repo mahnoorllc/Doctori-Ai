@@ -11,9 +11,23 @@ interface UserProfile {
   role: UserRole;
   approval_status: ApprovalStatus;
   name?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
   age?: number;
   gender?: 'male' | 'female' | 'other';
   photo_url?: string;
+  phone?: string;
+  weight?: number;
+  height?: number;
+  blood_group?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  emergency_contact?: string;
+  medical_conditions?: string[];
+  medications?: string[];
+  allergies?: string[];
+  bio?: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 export const useRoleBasedAuth = () => {
@@ -40,7 +54,7 @@ export const useRoleBasedAuth = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, role, approval_status, name, age, gender, photo_url')
+        .select('*')
         .eq('id', user.id)
         .single();
 
