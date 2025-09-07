@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +24,6 @@ const Chat = () => {
   const [chatLanguage, setChatLanguage] = useState<Language>(language);
   const { speak } = useTextToSpeech();
 
-  // Use guest chat by default, authenticated chat when logged in
   const authenticatedChat = useChatSession();
   const guestChat = useGuestChat();
   const isAuthenticated = user && !loading;
@@ -42,24 +40,20 @@ const Chat = () => {
     const content = messageInput.trim();
     if (!content) return;
 
-    // Check if the message is health-related
     if (!isHealthRelated(content)) {
-      // Add filter response as assistant message
       const filterMessage = {
         id: Date.now().toString(),
         content: getHealthFilterResponse(),
         role: 'assistant' as const,
         timestamp: new Date(),
         isUrgent: false
-      };
+      }
 
-      // Add the message to state (this is a simplified approach)
       chat.sendMessage("__FILTER_RESPONSE__" + content);
       setMessageInput('');
       return;
     }
 
-    // Send message with language context
     chat.sendMessage(content);
     setMessageInput('');
   };
@@ -67,7 +61,6 @@ const Chat = () => {
   const handleVoiceMessage = (message: string) => {
     if (message.trim()) {
       setMessageInput(message);
-      // Auto-send voice messages
       setTimeout(() => {
         handleSendMessage();
       }, 500);
@@ -76,7 +69,6 @@ const Chat = () => {
 
   const handleSpeakText = async (text: string) => {
     await speak(text, { voice: 'alloy' });
-  };
   };
 
   const handleViewSummary = () => {
@@ -106,10 +98,9 @@ const Chat = () => {
   }
 
   const getPlaceholder = () => {
-    if (chatLanguage === 'bn') {
-      return "আপনার স্বাস্থ্য সমস্যা বিস্তারিত বর্ণনা করুন...";
-    }
-    return "Describe your health concerns in detail...";
+    return chatLanguage === 'bn'
+      ? "আপনার স্বাস্থ্য সমস্যা বিস্তারিত বর্ণনা করুন..."
+      : "Describe your health concerns in detail...";
   };
 
   return (
@@ -130,9 +121,8 @@ const Chat = () => {
               </div>
             )}
           </CardHeader>
-          
+
           <CardContent className="p-0 flex flex-col h-[calc(100vh-12rem)] md:h-auto">
-            {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 min-h-[300px] md:h-96">
               {chat.sessionState.messages.map(message => (
                 <div key={message.id} className={`flex items-start space-x-3 ${message.role === 'user' ? "flex-row-reverse space-x-reverse" : ""}`}>
@@ -153,7 +143,7 @@ const Chat = () => {
                   </div>
                 </div>
               ))}
-              
+
               {chat.sessionState.isLoading && (
                 <div className="flex items-center space-x-2">
                   <div className="bg-muted p-2 rounded-full">
@@ -170,7 +160,6 @@ const Chat = () => {
               )}
             </div>
 
-            {/* Input Area */}
             <div className="p-4 md:p-6 border-t">
               {chat.sessionState.phase === "summary" || ('requiresAuth' in chat.sessionState && chat.sessionState.requiresAuth) ? (
                 <div className="space-y-4">
@@ -178,8 +167,7 @@ const Chat = () => {
                     <Download className="h-4 w-4 mr-2" />
                     {isAuthenticated ? 'View Your Health Summary & Recommended Doctors' : 'Get Your Health Summary (Login Required)'}
                   </Button>
-                  
-                  {/* Emergency Call Button - Always Visible */}
+
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <div className="flex items-center justify-center space-x-2 mb-2">
                       <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -196,7 +184,6 @@ const Chat = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Voice Chat Interface for Premium Users */}
                   {isAuthenticated && (
                     <VoiceChatInterface 
                       onVoiceMessage={handleVoiceMessage}
@@ -204,8 +191,7 @@ const Chat = () => {
                       disabled={chat.sessionState.isLoading}
                     />
                   )}
-                  
-                  {/* Emergency Alert - Always Visible */}
+
                   {(chat.sessionState.urgencyLevel === "high" || chat.sessionState.urgencyLevel === "emergency") && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <div className="flex items-center space-x-2 mb-2">
@@ -221,8 +207,7 @@ const Chat = () => {
                       </Button>
                     </div>
                   )}
-                  
-                  {/* Language Selector */}
+
                   <div className="flex items-center space-x-2 mb-2">
                     <Globe className="h-4 w-4 text-muted-foreground" />
                     <Select value={chatLanguage} onValueChange={(value: string) => setChatLanguage(value as Language)}>
@@ -235,7 +220,7 @@ const Chat = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <Textarea 
                       value={messageInput}
@@ -249,8 +234,7 @@ const Chat = () => {
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
-                  
-                  {/* Medical Disclaimer - Always Visible */}
+
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <div className="text-center">
                       <p className="text-xs md:text-sm text-blue-800 mb-1">
@@ -268,7 +252,6 @@ const Chat = () => {
         </Card>
       </div>
 
-      {/* Authentication Dialog */}
       <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
